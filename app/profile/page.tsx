@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SiteHeader } from "@/components/layout/site-header"
 import { TabBar } from "@/components/layout/tab-bar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { User, Settings, FileText } from "lucide-react"
+import { Settings, FileText } from "lucide-react"
 import { MySubmissionsTab } from "@/components/profile/my-submissions-tab"
 import { SettingsTab } from "@/components/profile/settings-tab"
 
@@ -23,6 +23,7 @@ interface UserPermissions {
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth()
+  const [displayName, setDisplayName] = useState("")
   const [permissions, setPermissions] = useState<UserPermissions>({
     isAdmin: false,
     isTrusted: false,
@@ -34,24 +35,31 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      // 権限情報を取得
-      fetch("/api/profile/check-admin")
-        .then(async (res) => {
+      Promise.all([
+        fetch("/api/profile/check-admin").then(async (res) => {
           if (!res.ok) {
             throw new Error("権限情報の取得に失敗しました")
           }
           return res.json()
-        })
-        .then((data) => {
+        }),
+        fetch("/api/profile/user-profile").then(async (res) => {
+          if (!res.ok) {
+            throw new Error("プロフィールの取得に失敗しました")
+          }
+          return res.json()
+        }),
+      ])
+        .then(([permissionData, profileData]) => {
           setPermissions({
-            isAdmin: data.isAdmin || false,
-            isTrusted: data.isTrusted || false,
-            userId: data.userId || user.id,
-            email: data.email || user.email || null,
+            isAdmin: permissionData.isAdmin || false,
+            isTrusted: permissionData.isTrusted || false,
+            userId: permissionData.userId || user.id,
+            email: permissionData.email || user.email || null,
           })
+          setDisplayName(profileData.displayName || "")
         })
         .catch((err) => {
-          console.error("Failed to fetch permissions:", err)
+          console.error("Failed to fetch profile data:", err)
         })
         .finally(() => {
           setLoadingPermissions(false)
@@ -107,6 +115,8 @@ export default function ProfilePage() {
     .split("")
     .join("") || "U"
 
+  const effectiveDisplayName = displayName || `Explorer_${user.id.slice(-6)}`
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
@@ -123,16 +133,14 @@ export default function ProfilePage() {
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-2xl font-bold">{user.email}</h1>
-                    {permissions.isTrusted && (
-                      <Badge variant="default" className="bg-green-500 text-green-900">
-                        信頼ユーザー
-                      </Badge>
-                    )}
-                    {!permissions.isTrusted && (
-                      <Badge variant="outline">メンバー</Badge>
-                    )}
+                    <h1 className="text-2xl font-bold">{effectiveDisplayName}</h1>
+                    <Badge variant={permissions.isAdmin ? "default" : "outline"}>
+                      {permissions.isAdmin ? "管理者" : "メンバー"}
+                    </Badge>
                   </div>
+                  <p className="text-sm text-muted-foreground">
+                    メール: {user.email}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     ユーザーID: {permissions.userId || user.id}
                   </p>
@@ -151,7 +159,7 @@ export default function ProfilePage() {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="submissions">
                 <FileText className="mr-2 h-4 w-4" />
-                マイ投稿
+                マイ申請
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Settings className="mr-2 h-4 w-4" />
@@ -164,7 +172,10 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-4">
-              <SettingsTab />
+              <SettingsTab
+                initialDisplayName={displayName}
+                onDisplayNameSaved={setDisplayName}
+              />
             </TabsContent>
           </Tabs>
         </main>

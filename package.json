@@ -1,5 +1,5 @@
 {
-  "name": "my-v0-project",
+  "name": "figuraffiti",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -13,7 +13,8 @@
     "start": "next start",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
-    "supabase:status": "npx supabase status"
+    "supabase:status": "npx supabase status",
+    "supabase:db:run-full-schema": "node scripts/run-full-schema.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -79,6 +80,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "lightningcss": "^1.30.2",
+    "pg": "^8.20.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tsx": "^4.19.2",

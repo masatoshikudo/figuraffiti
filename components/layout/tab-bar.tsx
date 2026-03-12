@@ -2,12 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Map, Plus, User } from "lucide-react"
+import { Map, QrCode, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const tabs = [
-  { href: "/mapping", label: "アーカイブ", icon: Map },
-  { href: "/submit", label: "記録", icon: Plus },
+  { href: "/discover/mapping", label: "探索", icon: Map },
+  { href: "/discover/nfc", label: "記録", icon: QrCode },
   { href: "/profile", label: "プロフィール", icon: User },
 ]
 

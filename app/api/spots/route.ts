@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/supabase-server"
 import type { Spot } from "@/types/spot"
-import { dbToSpot, spotToDb, mediaToDb } from "@/lib/spot/spot-converter"
+import { dbToSpot, spotToDb, getCoverUrlFromMedia } from "@/lib/spot/spot-converter"
 import { parseApiError, logApiError } from "@/lib/api/api-utils"
 import { SPOT_MERGE_CONFIG, SPOT_STATUS, ERROR_MESSAGES } from "@/lib/constants"
 import { calculateDistance } from "@/lib/spot/spot-utils"
@@ -80,18 +80,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Spot not found" }, { status: 404 })
       }
 
-      // メディアを取得
-      const { data: media, error: mediaError } = await supabase
-        .from("spot_media")
-        .select("*")
-        .eq("spot_id", id)
-        .order("created_at", { ascending: true })
-
-      if (mediaError) {
-        console.error("[GET /api/spots] Error fetching media:", mediaError)
-      }
-
-      const spotWithMedia = dbToSpot(spot, media || [])
+      const spotWithMedia = dbToSpot(spot)
       const response = NextResponse.json(spotWithMedia)
       response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
       response.headers.set('Pragma', 'no-cache')
@@ -145,22 +134,7 @@ export async function GET(request: NextRequest) {
       })) || [],
     })
 
-    // 各スポットのメディアを取得
-    const spotsWithMedia = await Promise.all(
-      (spots || []).map(async (spot) => {
-        const { data: media, error: mediaError } = await supabase
-          .from("spot_media")
-          .select("*")
-          .eq("spot_id", spot.id)
-          .order("created_at", { ascending: true })
-
-        if (mediaError) {
-          console.error(`[GET /api/spots] Error fetching media for spot ${spot.id}:`, mediaError)
-        }
-
-        return dbToSpot(spot, media || [])
-      })
-    )
+    const spotsWithMedia = (spots || []).map((spot) => dbToSpot(spot))
 
     console.log("[GET /api/spots] Returning spots with media:", {
       count: spotsWithMedia.length,
@@ -191,7 +165,7 @@ export async function GET(request: NextRequest) {
 async function sendAdminNotification(
   spot: Spot,
   submittedByEmail: string | null,
-  trickName: string | null,
+  contextText: string | null,
   mediaUrl: string | null
 ): Promise<void> {
   try {
@@ -217,7 +191,7 @@ async function sendAdminNotification(
         spotName: spot.spotName || "（場所名なし）",
         submittedBy: spot.submittedBy || null,
         submittedByEmail: submittedByEmail,
-        trickName: trickName,
+        contextText: contextText,
         mediaUrl: mediaUrl,
       }),
     })
@@ -322,9 +296,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields: lat, lng" }, { status: 400 })
     }
 
-    if (!spotData.media || spotData.media.length === 0) {
-      return NextResponse.json({ error: "At least one media item is required" }, { status: 400 })
-    }
+    // Phase1: メディアは任意（cover_url 用。無ければ null）
 
     // 信頼ユーザーかどうかを確認（自動承認のため）
     const isTrusted = await isTrustedUser(user.id)
@@ -354,17 +326,16 @@ export async function POST(request: NextRequest) {
         const dbSpot = spotToDb(spotData)
         spotId = spotData.id || Date.now().toString()
 
-        const insertData: any = {
-          ...dbSpot,
-          id: spotId,
-          status: initialStatus,
-          created_at: new Date().toISOString(),
-        }
+      const insertData: any = {
+        ...dbSpot,
+        id: spotId,
+        status: initialStatus,
+        cover_url: getCoverUrlFromMedia(spotData.media || []) ?? null,
+        created_at: new Date().toISOString(),
+      }
 
-        // 認証済みユーザーの場合、submitted_byを設定（必須）
         insertData.submitted_by = user.id
 
-        // 信頼ユーザーの場合、自動承認の情報を設定
         if (isTrusted) {
           insertData.approved_by = user.id
           insertData.approved_at = new Date().toISOString()
@@ -420,13 +391,12 @@ export async function POST(request: NextRequest) {
         ...dbSpot,
         id: spotId,
         status: initialStatus,
+        cover_url: getCoverUrlFromMedia(spotData.media || []) ?? null,
         created_at: new Date().toISOString(),
       }
 
-      // 認証済みユーザーの場合、submitted_byを設定（必須）
       insertData.submitted_by = user.id
 
-      // 信頼ユーザーの場合、自動承認の情報を設定
       if (isTrusted) {
         insertData.approved_by = user.id
         insertData.approved_at = new Date().toISOString()
@@ -486,72 +456,12 @@ export async function POST(request: NextRequest) {
       insertedSpot = newSpot
     }
 
-    // メディアをデータベースに挿入
-    const mediaInserts = spotData.media.map((media) => mediaToDb(media, spotId))
-
-    console.log("[POST /api/spots] Inserting media:", {
-      spotId,
-      mediaCount: mediaInserts.length,
-      mediaInserts: mediaInserts.map((m) => ({
-        spot_id: m.spot_id,
-        type: m.type,
-        source: m.source,
-        url: m.url ? "[REDACTED]" : null,
-      })),
-    })
-
-    const { error: mediaError } = await supabase.from("spot_media").insert(mediaInserts)
-
-    if (mediaError) {
-      // 詳細なエラーログを出力
-      console.error("[POST /api/spots] Error inserting media:", {
-        error: mediaError.message,
-        code: mediaError.code,
-        hint: mediaError.hint,
-        details: mediaError.details,
-        spotId,
-        mediaCount: mediaInserts.length,
-      })
-
-      const apiError = parseApiError(
-        { status: 500 } as Response,
-        {
-          error: mediaError.message,
-          code: mediaError.code,
-          hint: mediaError.hint,
-        }
-      )
-      logApiError("Error inserting media", apiError)
-      
-      // 新しいスポットを作成した場合のみ削除（既存スポットの場合は削除しない）
-      if (!existingSpot) {
-        await supabase.from("spots").delete().eq("id", spotId)
-      }
-      
-      return NextResponse.json(
-        {
-          error: "Failed to create media",
-          details: process.env.NODE_ENV === "development" ? apiError.details : mediaError.message,
-          code: apiError.code,
-          hint: apiError.hint,
-        },
-        { status: 500 }
-      )
-    }
-
-    // 作成された/更新されたスポットを取得して返す
-    const { data: media } = await supabase
-      .from("spot_media")
-      .select("*")
-      .eq("spot_id", spotId)
-      .order("created_at", { ascending: true })
-
-    const updatedSpot = dbToSpot(insertedSpot, media || [])
+    const updatedSpot = dbToSpot(insertedSpot)
 
     // 承認待ちの場合はメッセージを追加し、管理者に通知を送信
     if (updatedSpot.status === SPOT_STATUS.PENDING) {
       // 管理者へのメール通知を送信（非同期、エラーは無視）
-      sendAdminNotification(updatedSpot, user.email || null, spotData.trick || null, spotData.media?.[0]?.url || null).catch((error) => {
+      sendAdminNotification(updatedSpot, user.email || null, spotData.context || null, spotData.media?.[0]?.url || null).catch((error) => {
         console.error("Error sending admin notification:", error)
         // 通知エラーは致命的ではないので、続行
       })
@@ -559,7 +469,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ...updatedSpot,
-          message: "発見報告を受け付けました。承認後にマップに表示されます。",
+          message: "スポット申請を受け付けました。確認後に反映されます。",
         },
         { status: existingSpot ? 200 : 201 }
       )
@@ -620,14 +530,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Spot not found" }, { status: 404 })
     }
 
-    // スポット情報を更新
     const dbSpot = spotToDb(spotData)
+    const updatePayload: Record<string, unknown> = {
+      ...dbSpot,
+      updated_at: new Date().toISOString(),
+    }
+
     const { data: updatedSpot, error: updateError } = await supabase
       .from("spots")
-      .update({
-        ...dbSpot,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", id)
       .select()
       .single()
@@ -653,45 +564,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // メディアの更新（提供されている場合）
-    if (spotData.media && spotData.media.length > 0) {
-      // 既存のメディアを削除
-      await supabase.from("spot_media").delete().eq("spot_id", id)
-
-      // 新しいメディアを挿入
-      const mediaInserts = spotData.media.map((media) => mediaToDb(media, id))
-      const { error: mediaError } = await supabase.from("spot_media").insert(mediaInserts)
-
-      if (mediaError) {
-        const apiError = parseApiError(
-          { status: 500 } as Response,
-          {
-            error: mediaError.message,
-            code: mediaError.code,
-            hint: mediaError.hint,
-          }
-        )
-        logApiError("Error updating media", apiError)
-        return NextResponse.json(
-          {
-            error: "Failed to update media",
-            details: process.env.NODE_ENV === "development" ? apiError.details : undefined,
-            code: apiError.code,
-            hint: apiError.hint,
-          },
-          { status: 500 }
-        )
-      }
-    }
-
-    // 更新されたスポットを取得して返す
-    const { data: media } = await supabase
-      .from("spot_media")
-      .select("*")
-      .eq("spot_id", id)
-      .order("created_at", { ascending: true })
-
-    const updatedSpotWithMedia = dbToSpot(updatedSpot, media || [])
+    const updatedSpotWithMedia = dbToSpot(updatedSpot)
 
     return NextResponse.json(updatedSpotWithMedia)
   } catch (error) {
@@ -734,33 +607,6 @@ export async function DELETE(request: NextRequest) {
 
     if (fetchError || !existingSpot) {
       return NextResponse.json({ error: "Spot not found" }, { status: 404 })
-    }
-
-    // メディアを先に削除（外部キー制約のため）
-    const { error: mediaDeleteError } = await supabase
-      .from("spot_media")
-      .delete()
-      .eq("spot_id", id)
-
-    if (mediaDeleteError) {
-      const apiError = parseApiError(
-        { status: 500 } as Response,
-        {
-          error: mediaDeleteError.message,
-          code: mediaDeleteError.code,
-          hint: mediaDeleteError.hint,
-        }
-      )
-      logApiError("Error deleting media", apiError)
-      return NextResponse.json(
-        {
-          error: "Failed to delete media",
-          details: process.env.NODE_ENV === "development" ? apiError.details : undefined,
-          code: apiError.code,
-          hint: apiError.hint,
-        },
-        { status: 500 }
-      )
     }
 
     // スポットを削除

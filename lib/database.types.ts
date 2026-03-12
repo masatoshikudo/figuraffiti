@@ -12,80 +12,142 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      spots: {
+      co_create_submissions: {
         Row: {
           id: string
-          title: string
-          skater: string
-          trick: string
-          spot_name: string
-          prefecture: string | null
+          title: string | null
+          intent_text: string
           lat: number
           lng: number
-          year: number | null
-          credit: string | null
+          media_url: string
+          media_type: string
+          media_source: string
+          status: string
+          submitted_by: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          review_comment: string | null
+          linked_spot_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title?: string | null
+          intent_text: string
+          lat: number
+          lng: number
+          media_url: string
+          media_type?: string
+          media_source?: string
+          status?: string
+          submitted_by: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          review_comment?: string | null
+          linked_spot_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string | null
+          intent_text?: string
+          lat?: number
+          lng?: number
+          media_url?: string
+          media_type?: string
+          media_source?: string
+          status?: string
+          submitted_by?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          review_comment?: string | null
+          linked_spot_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      nfc_tags: {
+        Row: {
+          id: string
+          token: string
+          spot_id: string
+          is_active: boolean
           note: string | null
-          tags: string[] | null
           created_at: string
         }
         Insert: {
           id?: string
-          title: string
-          skater: string
-          trick: string
-          spot_name: string
-          prefecture?: string | null
-          lat: number
-          lng: number
-          year?: number | null
-          credit?: string | null
+          token: string
+          spot_id: string
+          is_active?: boolean
           note?: string | null
-          tags?: string[] | null
           created_at?: string
         }
         Update: {
           id?: string
-          title?: string
-          skater?: string
-          trick?: string
-          spot_name?: string
-          prefecture?: string | null
-          lat?: number
-          lng?: number
-          year?: number | null
-          credit?: string | null
+          token?: string
+          spot_id?: string
+          is_active?: boolean
           note?: string | null
-          tags?: string[] | null
           created_at?: string
         }
       }
-      spot_media: {
+      spots: {
         Row: {
-          id: number
-          spot_id: string
-          type: 'cover' | 'article' | 'video'
-          source: 'Instagram' | 'YouTube' | 'Twitter' | 'X' | 'Threads' | 'TikTok' | 'Other'
-          url: string
-          thumb_url: string | null
+          id: string
+          spot_name: string
+          context: string | null
+          prefecture: string | null
+          lat: number
+          lng: number
+          status: string
+          submitted_by: string | null
+          approved_by: string | null
+          approved_at: string | null
+          rejection_reason: string | null
+          last_seen: string | null
+          spot_number: number | null
+          cover_url: string | null
           created_at: string
+          updated_at: string
         }
         Insert: {
-          id?: number
-          spot_id: string
-          type: 'cover' | 'article' | 'video'
-          source: 'Instagram' | 'YouTube' | 'Twitter' | 'X' | 'Threads' | 'TikTok' | 'Other'
-          url: string
-          thumb_url?: string | null
+          id?: string
+          spot_name?: string
+          context?: string | null
+          prefecture?: string | null
+          lat: number
+          lng: number
+          status?: string
+          submitted_by?: string | null
+          approved_by?: string | null
+          approved_at?: string | null
+          rejection_reason?: string | null
+          last_seen?: string | null
+          spot_number?: number | null
+          cover_url?: string | null
           created_at?: string
+          updated_at?: string
         }
         Update: {
-          id?: number
-          spot_id?: string
-          type?: 'cover' | 'article' | 'video'
-          source?: 'Instagram' | 'YouTube' | 'TikTok' | 'Other'
-          url?: string
-          thumb_url?: string | null
+          id?: string
+          spot_name?: string
+          context?: string | null
+          prefecture?: string | null
+          lat?: number
+          lng?: number
+          status?: string
+          submitted_by?: string | null
+          approved_by?: string | null
+          approved_at?: string | null
+          rejection_reason?: string | null
+          last_seen?: string | null
+          spot_number?: number | null
+          cover_url?: string | null
           created_at?: string
+          updated_at?: string
         }
       }
     }
@@ -93,7 +155,27 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      record_discovery: {
+        Args: {
+          p_spot_id: string
+        }
+        Returns: {
+          success: boolean
+          duplicate: boolean
+          message: string
+        }[]
+      }
+      record_discovery_by_token: {
+        Args: {
+          p_token: string
+        }
+        Returns: {
+          success: boolean
+          duplicate: boolean
+          message: string
+          spot_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

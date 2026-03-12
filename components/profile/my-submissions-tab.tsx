@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { RefreshCw, CheckCircle, XCircle, Clock } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { ERROR_MESSAGES, UI_TEXT, SPOT_STATUS } from "@/lib/constants"
-import type { Spot } from "@/types/spot"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { API_CONFIG, UI_TEXT } from "@/lib/constants"
+import type { CoCreateSubmission } from "@/types/co-create"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function MySubmissionsTab() {
-  const [submissions, setSubmissions] = useState<Spot[]>([])
+  const [submissions, setSubmissions] = useState<CoCreateSubmission[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all")
   const { toast } = useToast()
 
   const fetchSubmissions = () => {
     setLoading(true)
-    fetch("/api/spots/my-submissions", {
+    fetch(API_CONFIG.CO_CREATE_MY_SUBMISSIONS_ENDPOINT, {
       credentials: "include", // Cookieを含める
     })
       .then(async (res) => {
@@ -92,9 +92,9 @@ export function MySubmissionsTab() {
     fetchSubmissions()
   }, [])
 
-  const filteredSubmissions = submissions.filter((spot) => {
+  const filteredSubmissions = submissions.filter((submission) => {
     if (filter === "all") return true
-    return spot.status === filter
+    return submission.status === filter
   })
 
   const stats = {
@@ -138,7 +138,7 @@ export function MySubmissionsTab() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">総投稿数</CardTitle>
+              <CardTitle className="text-sm font-medium">総申請数</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -174,7 +174,7 @@ export function MySubmissionsTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>投稿一覧</CardTitle>
+            <CardTitle>共創申請一覧</CardTitle>
             <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               更新
@@ -195,42 +195,39 @@ export function MySubmissionsTab() {
             <div className="text-center py-8 text-muted-foreground">読み込み中...</div>
           ) : filteredSubmissions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {filter === "all" ? "投稿がありません" : `${filter === "pending" ? "承認待ち" : filter === "approved" ? "承認済み" : "却下"}の投稿がありません`}
+              {filter === "all" ? "申請がありません" : `${filter === "pending" ? "承認待ち" : filter === "approved" ? "承認済み" : "却下"}の申請がありません`}
             </div>
           ) : (
             <div className="mt-4 space-y-3">
-              {filteredSubmissions.map((spot) => (
+              {filteredSubmissions.map((submission) => (
                 <div
-                  key={spot.id}
+                  key={submission.id}
                   className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-lg">{spot.spotName}</h3>
-                        {getStatusBadge(spot.status)}
+                        <h3 className="font-semibold text-lg">{submission.title || "無題の申請"}</h3>
+                        {getStatusBadge(submission.status)}
                       </div>
-                      {spot.prefecture && (
-                        <p className="text-sm text-muted-foreground">{spot.prefecture}</p>
-                      )}
-                      {spot.skater && spot.trick && (
-                        <p className="text-sm text-muted-foreground">
-                          {spot.skater} · {spot.trick}
-                        </p>
-                      )}
-                      {spot.year && <p className="text-sm text-muted-foreground">{spot.year}年</p>}
-                      <p className="text-xs text-muted-foreground mt-2">
-                        投稿日時: {new Date(spot.createdAt).toLocaleString("ja-JP")}
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                        {submission.intentText}
                       </p>
-                      {spot.status === "rejected" && spot.rejectionReason && (
+                      <p className="text-sm text-muted-foreground mt-2 break-all">
+                        {submission.mediaUrl}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        申請日時: {new Date(submission.createdAt).toLocaleString("ja-JP")}
+                      </p>
+                      {submission.status === "rejected" && submission.reviewComment && (
                         <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded text-sm">
                           <p className="font-semibold text-red-800 dark:text-red-200">却下理由:</p>
-                          <p className="text-red-700 dark:text-red-300">{spot.rejectionReason}</p>
+                          <p className="text-red-700 dark:text-red-300">{submission.reviewComment}</p>
                         </div>
                       )}
-                      {spot.status === "approved" && spot.approvedAt && (
+                      {submission.status === "approved" && submission.reviewedAt && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          承認日時: {new Date(spot.approvedAt).toLocaleString("ja-JP")}
+                          承認日時: {new Date(submission.reviewedAt).toLocaleString("ja-JP")}
                         </p>
                       )}
                     </div>

@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/supabase-server"
 import { getUserProfile, upsertUserProfile } from "@/lib/api/user-profile-utils"
-import { USER_SKILL_LEVELS } from "@/lib/constants"
 
 /**
  * GET: ユーザープロフィールを取得
@@ -21,18 +20,13 @@ export async function GET(request: NextRequest) {
     const profile = await getUserProfile(user.id)
 
     if (!profile) {
-      // プロフィールが存在しない場合はデフォルト値を返す
       return NextResponse.json({
-        skillLevel: USER_SKILL_LEVELS.DEFAULT,
-        levelSetBy: null,
-        detectedSkaterName: null,
+        displayName: null,
       })
     }
 
     return NextResponse.json({
-      skillLevel: profile.skillLevel,
-      levelSetBy: profile.levelSetBy,
-      detectedSkaterName: profile.detectedSkaterName,
+      displayName: profile.displayName,
     })
   } catch (error) {
     console.error("Unexpected error:", error)
@@ -62,33 +56,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { skillLevel, levelSetBy, detectedSkaterName } = body
-
-    // バリデーション
-    if (typeof skillLevel !== "number" || skillLevel < USER_SKILL_LEVELS.MIN || skillLevel > USER_SKILL_LEVELS.MAX) {
+    const rawDisplayName = body.displayName
+    if (rawDisplayName != null && typeof rawDisplayName !== "string") {
       return NextResponse.json(
-        { error: `Skill level must be between ${USER_SKILL_LEVELS.MIN} and ${USER_SKILL_LEVELS.MAX}` },
+        { error: "displayName must be a string" },
         { status: 400 }
       )
     }
 
-    if (!levelSetBy || !["questionnaire", "auto_detected", "manual"].includes(levelSetBy)) {
-      return NextResponse.json(
-        { error: "levelSetBy must be one of: questionnaire, auto_detected, manual" },
-        { status: 400 }
-      )
-    }
+    const displayName = rawDisplayName?.trim() ? rawDisplayName.trim().slice(0, 40) : null
 
-    const profile = await upsertUserProfile(user.id, skillLevel, levelSetBy, detectedSkaterName)
+    const profile = await upsertUserProfile(user.id, displayName)
 
     if (!profile) {
       return NextResponse.json({ error: "プロフィールの作成/更新に失敗しました" }, { status: 500 })
     }
 
     return NextResponse.json({
-      skillLevel: profile.skillLevel,
-      levelSetBy: profile.levelSetBy,
-      detectedSkaterName: profile.detectedSkaterName,
+      displayName: profile.displayName,
     })
   } catch (error) {
     console.error("Unexpected error:", error)

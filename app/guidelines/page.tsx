@@ -12,42 +12,42 @@ export default function GuidelinesPage() {
         <div className="space-y-8">
           <div className="text-center space-y-4">
             <h1 className={combineTokens(getTypography({ size: "4xl", weight: "bold" }))}>
-              投稿ガイドライン
+              探索・発見記録ガイドライン
             </h1>
             <p className={combineTokens(getTypography({ size: "lg" }), "text-muted-foreground")}>
-              Figuraffitiは、街で見つけた立体グラフィティの「発見」を共有するサービスです
+              AhhHum は、街で痕跡を探し、発見を記録する都市探索サービスです
             </p>
           </div>
 
-          {/* 発見報告の目的 */}
+          {/* 発見記録の目的 */}
           <Card>
             <CardHeader>
-              <CardTitle>発見報告の目的</CardTitle>
+              <CardTitle>発見記録の目的</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Figuraffitiは、都市の余白に設置された立体グラフィティ（フィギュア）を探し、発見を記録・共有するためのサービスです。
+                AhhHum は、都市の余白に潜む痕跡を探し、現地で発見した事実を記録するためのサービスです。
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>「ここで、このキャラを見つけた」という発見を残す</li>
-                <li>承認された報告だけがマップに表示される</li>
-                <li>QR/NFCからキャラのストーリーや発見ログを閲覧できる</li>
+                <li>「ここで見つけた」という発見の証跡を残す</li>
+                <li>Last Seen やティッカーに世界の動きを反映する</li>
+                <li>QR/NFC を通じて発見とデジタル体験を接続する</li>
               </ul>
             </CardContent>
           </Card>
 
-          {/* 報告の方法 */}
+          {/* 記録の方法 */}
           <Card>
             <CardHeader>
-              <CardTitle>報告の方法</CardTitle>
-              <CardDescription>地図で場所を選び、作品名とSNSリンクを送信するだけです</CardDescription>
+              <CardTitle>記録の方法</CardTitle>
+              <CardDescription>マップで探し、現地で NFC / QR を使って記録します</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
                 詳しくは<Link href="/how-it-works" className="text-primary hover:underline">探し方</Link>ページをご覧ください。
               </p>
               <p className="text-sm text-muted-foreground">
-                地図で発見場所を選び、作品名・キャラ名とメディア（Instagram / TikTok / YouTube など）のURLを入力して送信します。承認後、マップに表示されます。
+                曖昧なサークルを手がかりに現地まで行き、スポット番号入力または NFC / QR 読み取りで発見を記録します。
               </p>
             </CardContent>
           </Card>
@@ -59,44 +59,44 @@ export default function GuidelinesPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2 text-primary">✅ 報告すべきこと</h3>
+                <h3 className="font-semibold mb-2 text-primary">✅ 守るべきこと</h3>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>実際にその場所で見つけた Figuraffiti であること</li>
-                  <li>動画や写真で発見の様子が分かること</li>
-                  <li>場所・作品名が正確であること</li>
+                  <li>実際にその場所で見つけた痕跡だけを記録すること</li>
+                  <li>私有地・危険な場所・法令違反となる行為を避けること</li>
+                  <li>スポット番号や記録内容を正確に扱うこと</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold mb-2 text-destructive">❌ 報告してはいけないこと</h3>
+                <h3 className="font-semibold mb-2 text-destructive">❌ してはいけないこと</h3>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>捏造や別の場所の写真・動画</li>
-                  <li>不適切な内容やスパム</li>
-                  <li>重複した報告（同じ場所・同じ内容）</li>
+                  <li>捏造された記録や別場所でのなりすまし</li>
+                  <li>危険行為、迷惑行為、私有地への無断立ち入り</li>
+                  <li>スパム的な連続記録や不正な重複送信</li>
                 </ul>
               </div>
             </CardContent>
           </Card>
 
-          {/* 承認プロセス */}
+          {/* 運用方針 */}
           <Card>
             <CardHeader>
-              <CardTitle>承認プロセス</CardTitle>
+              <CardTitle>運用方針</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                すべての発見報告は管理者による承認が必要です。承認後、マップに表示され、該当キャラの「発見ログ」にも反映されます。
+                Phase1 の中心は「探索」と「発見記録」です。共創申請や高度な投稿機能は、後続フェーズで段階的に追加されます。
               </p>
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
-                  <span className="font-semibold">承認:</span>
+                  <span className="font-semibold">探索:</span>
                   <span className="text-sm text-muted-foreground">
-                    報告がマップに追加され、承認通知がメールで送信されます。
+                    曖昧なサークル、Last Seen、ティッカーを使って都市の中を探します。
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="font-semibold">却下:</span>
+                  <span className="font-semibold">記録:</span>
                   <span className="text-sm text-muted-foreground">
-                    不適切な場合などは却下され、却下理由がメールで通知されます。
+                    NFC / QR またはスポット番号入力で発見を記録します。
                   </span>
                 </div>
               </div>
@@ -112,19 +112,19 @@ export default function GuidelinesPage() {
               <div>
                 <h3 className="font-semibold mb-2">Q. ログインは必要ですか？</h3>
                 <p className="text-sm text-muted-foreground">
-                  A. 発見報告を送信するにはログインが必要です。承認・却下の通知を受け取るためにも認証してください。
+                  A. マップ閲覧は未ログインでも可能ですが、発見を記録するにはログインが必要です。
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Q. 動画や写真を直接アップできますか？</h3>
                 <p className="text-sm text-muted-foreground">
-                  A. 現時点では、Instagram・TikTok・YouTube などのURLを貼る形式です。メディアは既存のSNSのURLで共有してください。
+                  A. Phase1 では発見記録が中心で、メディア投稿は最小構成です。将来フェーズで強化予定です。
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Q. 投稿した報告を編集・削除できますか？</h3>
+                <h3 className="font-semibold mb-2">Q. 記録した内容を編集・削除できますか？</h3>
                 <p className="text-sm text-muted-foreground">
-                  A. アプリからは編集・削除できません。必要な場合は管理者に連絡してください。
+                  A. 現時点ではアプリからの編集・削除には対応していません。必要な場合は運営に連絡してください。
                 </p>
               </div>
             </CardContent>

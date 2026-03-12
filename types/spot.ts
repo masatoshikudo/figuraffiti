@@ -1,23 +1,17 @@
 export interface Spot {
   id: string
-  title: string | null // 後方互換性のため残す（使用しない）
-  skater: string | null // スケーター名（任意）
-  trick: string | null // 技名（必須項目）
-  spotName: string // スポット名（空文字も許可）
+  spotName: string // 場所名（渋谷など）
+  context?: string | null // 文脈テキスト（「かつて川だった場所」等）
   prefecture?: string // 都道府県（任意）
   address?: string // 住所（逆ジオコーディングで取得、任意）
   lat: number
   lng: number
-  year?: number // 年（任意）
   media: {
     type: "cover" | "video" // 'article'は削除
     source: "Instagram" | "YouTube" | "Twitter" | "X" | "Threads" | "TikTok" | "Other"
     url: string
     thumbUrl?: string
   }[]
-  credit?: string // 後方互換性のため残す（使用しない）
-  note?: string // 後方互換性のため残す（使用しない）
-  tags?: string[] // 後方互換性のため残す（使用しない）
   createdAt: string
   updatedAt?: string // 更新日時
   // 承認制関連のフィールド
@@ -26,6 +20,21 @@ export interface Spot {
   approvedBy?: string // UUID（承認者）
   approvedAt?: string // 承認日時
   rejectionReason?: string // 却下理由
+  // AhhHum Phase1
+  lastSeen?: string | null // 最終発見日時（鮮度表示用）
+  spotNumber?: number | null // #N の N（ティッカー表示用）
+  characterSlug?: string
+}
+
+/** 発見ログ（ティッカー表示用） */
+export interface DiscoveryLog {
+  id: string
+  spotId: string
+  userId: string
+  discoveredAt: string
+  userName?: string // 表示名（Explorer_xxx または display_name）
+  spotNumber?: number
+  locationName?: string // 地名（prefecture や address から取得）
 }
 
 export interface FilterOptions {

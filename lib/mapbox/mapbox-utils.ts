@@ -541,9 +541,6 @@ export function createClusterRangePulseMarker(
   // calculateClusterRangeはSpot型を要求するが、実際にはlat, lngのみ使用される
   const spotsForRange = clusterSpots.map((s) => ({
     id: `temp-${s.lat}-${s.lng}`,
-    title: null,
-    skater: null,
-    trick: null,
     spotName: "",
     lat: s.lat,
     lng: s.lng,

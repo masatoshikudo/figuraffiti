@@ -14,11 +14,11 @@ export default function HowItWorksPage() {
         <div className={combineTokens("container mx-auto text-center", getSpacingClasses({ px: "02", py: "08" }))}>
           <div className="space-y-4">
             <p className={combineTokens(getTypography({ size: "lg" }), "text-muted-foreground")}>
-              投稿のルールやFAQについては、<Link href="/guidelines" className="text-primary hover:underline">ガイドライン</Link>をご覧ください。
+              発見記録のルールやFAQについては、<Link href="/guidelines" className="text-primary hover:underline">ガイドライン</Link>をご覧ください。
             </p>
             <div className={combineTokens("flex justify-center gap-4", getSpacingClasses({ gap: "02" }))}>
               <Button size="lg" asChild>
-                <Link href="/mapping">マップで探す</Link>
+                <Link href="/discover/mapping">マップで探す</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="/guidelines">ガイドライン</Link>

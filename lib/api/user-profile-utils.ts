@@ -4,7 +4,6 @@
 
 import { createClient } from "@/lib/supabase/supabase-server"
 import type { UserProfile } from "@/types/user"
-import { USER_SKILL_LEVELS } from "@/lib/constants"
 
 /**
  * ユーザープロフィールを取得
@@ -34,9 +33,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     return {
       id: data.id,
       userId: data.user_id,
-      skillLevel: data.skill_level,
-      levelSetBy: data.level_set_by,
-      detectedSkaterName: data.detected_skater_name,
+      displayName: data.display_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     }
@@ -49,33 +46,22 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 /**
  * ユーザープロフィールを作成または更新
  * @param userId ユーザーID
- * @param skillLevel スキルレベル（1-10）
- * @param levelSetBy レベル設定方法
- * @param detectedSkaterName 自動判定の場合のスケーター名（オプション）
+ * @param displayName 表示名
  * @returns 作成/更新されたユーザープロフィール
  */
 export async function upsertUserProfile(
   userId: string,
-  skillLevel: number,
-  levelSetBy: "questionnaire" | "auto_detected" | "manual",
-  detectedSkaterName?: string | null
+  displayName: string | null
 ): Promise<UserProfile | null> {
   try {
     const supabase = await createClient()
-    
-    // スキルレベルの範囲チェック
-    if (skillLevel < USER_SKILL_LEVELS.MIN || skillLevel > USER_SKILL_LEVELS.MAX) {
-      throw new Error(`Skill level must be between ${USER_SKILL_LEVELS.MIN} and ${USER_SKILL_LEVELS.MAX}`)
-    }
 
     const { data, error } = await supabase
       .from("user_profiles")
       .upsert(
         {
           user_id: userId,
-          skill_level: skillLevel,
-          level_set_by: levelSetBy,
-          detected_skater_name: detectedSkaterName || null,
+          display_name: displayName,
         },
         {
           onConflict: "user_id",
@@ -94,9 +80,7 @@ export async function upsertUserProfile(
     return {
       id: data.id,
       userId: data.user_id,
-      skillLevel: data.skill_level,
-      levelSetBy: data.level_set_by,
-      detectedSkaterName: data.detected_skater_name,
+      displayName: data.display_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     }

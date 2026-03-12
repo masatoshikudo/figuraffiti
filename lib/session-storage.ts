@@ -1,7 +1,7 @@
 // フォームセッション保存用ユーティリティ
 // LocalStorageを使用してフォームの状態を保存・復元
 
-const STORAGE_KEY_PREFIX = 'skateright_submit_form_'
+const STORAGE_KEY_PREFIX = 'ahhhum_submit_form_'
 const SESSION_EXPIRY_DAYS = 7 // 7日間保持
 
 export interface SavedFormSession {
@@ -10,10 +10,7 @@ export interface SavedFormSession {
     lng: number | null
     prefecture: string
     spotName: string
-    skater: string
-    trick: string
-    year: string
-    credit: string
+    context: string
     videoUrl: string
     isVideoUrlValid: boolean
     mediaType: "cover" | "article" | "video"

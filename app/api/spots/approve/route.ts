@@ -75,14 +75,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // メディアを取得
-    const { data: media } = await supabase!
-      .from("spot_media")
-      .select("*")
-      .eq("spot_id", spotId)
-      .order("created_at", { ascending: true })
-
-    const spotWithMedia = dbToSpot(updatedSpot, media || [])
+    const spotWithMedia = dbToSpot(updatedSpot)
 
     // メール通知を送信（認証済みユーザーの場合）
     if ((spot as any).submitted_by) {

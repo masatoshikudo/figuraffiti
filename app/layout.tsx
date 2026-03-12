@@ -11,15 +11,15 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Figuraffiti — 都市の余白に物語を。",
+  title: "AhhHum — 都市の余白に物語を。",
   description:
-    "街に隠れた立体グラフィティを探し、発見を記録・共有する。ポケモンGO × ストリートアートの体験を。",
+    "街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創する体験プラットフォーム。",
   generator: "v0.app",
   openGraph: {
-    title: "Figuraffiti — 都市の余白に物語を。",
+    title: "AhhHum — 都市の余白に物語を。",
     description:
-      "街に隠れた立体グラフィティを探し、発見を記録・共有する。ポケモンGO × ストリートアートの体験を。",
-    url: "https://figuraffiti.com",
+      "街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創する体験プラットフォーム。",
+    url: "https://ahhhum.com",
     type: "website",
     images: ["/ogp.jpg"],
   },

@@ -29,29 +29,10 @@ export async function isAdmin(userId: string | null): Promise<boolean> {
 
 /**
  * ユーザーが信頼ユーザーかどうかを確認
+ * Phase1: trusted_users テーブル廃止のため常に false
  */
-export async function isTrustedUser(userId: string | null): Promise<boolean> {
-  if (!userId) {
-    return false
-  }
-
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("trusted_users")
-      .select("id")
-      .eq("user_id", userId)
-      .single()
-
-    if (error || !data) {
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error("Error checking trusted user status:", error)
-    return false
-  }
+export async function isTrustedUser(_userId: string | null): Promise<boolean> {
+  return false
 }
 
 /**

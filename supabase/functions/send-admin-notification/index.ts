@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { spotId, spotName, submittedBy, submittedByEmail, trickName, mediaUrl } = await req.json()
+    const { spotId, spotName, submittedBy, submittedByEmail, contextText, mediaUrl } = await req.json()
 
     if (!spotId || !spotName) {
       return new Response(
@@ -104,7 +104,7 @@ serve(async (req) => {
           <ul>
             <li><strong>記録ID:</strong> ${spotId}</li>
             <li><strong>場所:</strong> ${spotName}</li>
-            ${trickName ? `<li><strong>技名:</strong> ${trickName}</li>` : ""}
+            ${contextText ? `<li><strong>文脈:</strong> ${contextText}</li>` : ""}
             ${submittedByEmail ? `<li><strong>投稿者:</strong> ${submittedByEmail}</li>` : ""}
             ${mediaUrl ? `<li><strong>メディアURL:</strong> <a href="${mediaUrl}">${mediaUrl}</a></li>` : ""}
             <li><strong>投稿日時:</strong> ${new Date().toLocaleString("ja-JP")}</li>

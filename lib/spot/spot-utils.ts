@@ -87,28 +87,13 @@ export function searchSpots(spots: Spot[], query: string): Spot[] {
       return true
     }
 
-    // タイトルで検索
-    if (spot.title?.toLowerCase().includes(lowerQuery)) {
-      return true
-    }
-
-    // スケーターで検索
-    if (spot.skater?.toLowerCase().includes(lowerQuery)) {
-      return true
-    }
-
-    // 技名で検索
-    if (spot.trick?.toLowerCase().includes(lowerQuery)) {
+    // 文脈で検索
+    if (spot.context?.toLowerCase().includes(lowerQuery)) {
       return true
     }
 
     // 都道府県で検索
     if (spot.prefecture?.toLowerCase().includes(lowerQuery)) {
-      return true
-    }
-
-    // タグで検索
-    if (spot.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery))) {
       return true
     }
 
@@ -119,14 +104,9 @@ export function searchSpots(spots: Spot[], query: string): Spot[] {
 /**
  * 年代の配列を取得
  */
-export function getDecades(spots: Spot[]): string[] {
-  const decades = new Set<string>()
-  spots.forEach((spot) => {
-    if (spot.year) {
-      const decade = Math.floor(spot.year / 10) * 10
-      decades.add(decade.toString())
-    }
-  })
+export function getDecades(_spots: Spot[]): string[] {
+  // AhhHum: year カラム廃止のため空配列を返す
+  return []
   return Array.from(decades).sort((a, b) => parseInt(b) - parseInt(a))
 }
 
@@ -150,14 +130,6 @@ export function getUniqueSources(spots: Spot[]): string[] {
  */
 export function getFilteredSpots(spots: Spot[], filters: FilterOptions): Spot[] {
   return spots.filter((spot) => {
-    // 年代フィルタ
-    if (filters.decades.length > 0 && spot.year) {
-      const decade = Math.floor(spot.year / 10) * 10
-      if (!filters.decades.includes(decade.toString())) {
-        return false
-      }
-    }
-
     // ソースフィルタ
     if (filters.sources.length > 0) {
       const spotSources = spot.media?.map((m) => m.source).filter(Boolean) || []
@@ -173,12 +145,6 @@ export function getFilteredSpots(spots: Spot[], filters: FilterOptions): Spot[] 
       }
     }
 
-    // タグフィルタ
-    if (filters.tags.length > 0) {
-      if (!spot.tags || !filters.tags.some((tag) => spot.tags?.includes(tag))) {
-        return false
-      }
-    }
 
     return true
   })
@@ -202,12 +168,9 @@ export function getUniqueValues(spots: Spot[], key: "prefecture"): string[] {
 /**
  * ユニークなタグの配列を取得
  */
-export function getUniqueTags(spots: Spot[]): string[] {
-  const set = new Set<string>()
-  spots.forEach((spot) => {
-    spot.tags?.forEach((tag) => set.add(tag))
-  })
-  return Array.from(set).sort()
+export function getUniqueTags(_spots: Spot[]): string[] {
+  // AhhHum: tags カラム廃止のため空配列を返す
+  return []
 }
 
 /**

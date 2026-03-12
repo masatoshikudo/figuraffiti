@@ -51,6 +51,12 @@ export const API_CONFIG = {
   SPOTS_APPROVE_ENDPOINT: "/api/spots/approve",
   SPOTS_REJECT_ENDPOINT: "/api/spots/reject",
   SPOTS_MY_SUBMISSIONS_ENDPOINT: "/api/spots/my-submissions",
+  CO_CREATE_ENDPOINT: "/api/co-create",
+  CO_CREATE_PENDING_ENDPOINT: "/api/co-create/pending",
+  CO_CREATE_APPROVE_ENDPOINT: "/api/co-create/approve",
+  CO_CREATE_REJECT_ENDPOINT: "/api/co-create/reject",
+  CO_CREATE_MY_SUBMISSIONS_ENDPOINT: "/api/co-create/my-submissions",
+  DISCOVERIES_ENDPOINT: "/api/discoveries",
   PLACES_AUTOCOMPLETE_ENDPOINT: "/api/places/autocomplete",
   PLACES_DETAILS_ENDPOINT: "/api/places/details",
   ADMIN_TRUSTED_USERS_ENDPOINT: "/api/admin/trusted-users",
@@ -76,7 +82,7 @@ export const ERROR_MESSAGES = {
   // スポット関連エラー
   FETCH_PENDING_SPOTS_FAILED: "承認待ちの取得に失敗しました",
   FETCH_SUBMISSIONS_FAILED: "投稿の取得に失敗しました",
-  SUBMIT_FAILED: "発見報告の送信に失敗しました",
+  SUBMIT_FAILED: "発見記録の送信に失敗しました",
   APPROVE_FAILED: "承認に失敗しました",
   REJECT_FAILED: "却下に失敗しました",
   SPOT_NOT_FOUND: "スポットが見つかりませんでした",
@@ -86,7 +92,7 @@ export const ERROR_MESSAGES = {
   TRICK_NAME_REQUIRED: "作品名・キャラ名を入力してください",
   MEDIA_URL_REQUIRED: "メディアURLを入力してください",
   REJECTION_REASON_REQUIRED: "却下理由を入力してください",
-  LOGIN_REQUIRED_FOR_SUBMIT: "発見報告を投稿するにはログインが必要です",
+  LOGIN_REQUIRED_FOR_SUBMIT: "発見記録を行うにはログインが必要です",
   
   // ユーザー管理エラー
   FETCH_TRUSTED_USERS_FAILED: "信頼ユーザーの取得に失敗しました",
@@ -102,12 +108,14 @@ export const ERROR_MESSAGES = {
 
 // 成功メッセージ
 export const SUCCESS_MESSAGES = {
-  SPOT_SUBMITTED: "発見報告を送信しました",
-  SPOT_SUBMITTED_DESCRIPTION: "承認後、マップに表示されます",
+  SPOT_SUBMITTED: "発見記録を送信しました",
+  SPOT_SUBMITTED_DESCRIPTION: "記録が反映されました",
+  CO_CREATE_SUBMITTED: "共創申請を送信しました",
+  CO_CREATE_SUBMITTED_DESCRIPTION: "審査キューに追加しました",
   SPOT_APPROVED: "承認しました",
-  SPOT_APPROVED_DESCRIPTION: "発見報告がマップに追加されました",
+  SPOT_APPROVED_DESCRIPTION: "記録内容がマップに反映されました",
   SPOT_REJECTED: "却下しました",
-  SPOT_REJECTED_DESCRIPTION: "発見報告を却下しました",
+  SPOT_REJECTED_DESCRIPTION: "記録内容を却下しました",
   TRUSTED_USER_ADDED: "信頼ユーザーを追加しました",
   TRUSTED_USER_DELETED: "信頼ユーザーを削除しました",
 } as const
@@ -133,9 +141,12 @@ export const UI_TEXT = {
   TRICK_NAME: "作品名・キャラ名",
   MEDIA_URL: "SNSリンク",
   REJECTION_REASON: "却下理由",
-  SUBMIT_RECORD: "発見報告を送信",
-  RECORD_FORM: "発見報告フォーム",
-  MINIMAL_INFO_DESCRIPTION: "この場所で Figuraffiti を発見した報告を送信します",
+  SUBMIT_RECORD: "発見記録を送信",
+  SUBMIT_CO_CREATE: "共創申請を送信",
+  RECORD_FORM: "発見記録フォーム",
+  CO_CREATE_FORM: "共創申請フォーム",
+  MINIMAL_INFO_DESCRIPTION: "この場所で AhhHum の痕跡を見つけた記録を送信します",
+  CO_CREATE_DESCRIPTION: "設置意図、場所、参考リンクを添えて共創申請を送信します",
   
   // プレースホルダー
   TRICK_NAME_PLACEHOLDER: "例: キャラ名、作品名",
@@ -148,12 +159,14 @@ export const UI_TEXT = {
   MEDIA_URL_HELP: "",
   
   // ページタイトル
-  SUBMIT_PAGE_TITLE: "発見報告をする",
-  SUBMIT_PAGE_DESCRIPTION: "この場所で見つけた Figuraffiti を報告します",
+  SUBMIT_PAGE_TITLE: "発見記録をする",
+  SUBMIT_PAGE_DESCRIPTION: "この場所で見つけた痕跡を記録します",
+  APPLY_PAGE_TITLE: "設置申請をする",
+  APPLY_PAGE_DESCRIPTION: "街に新しい痕跡を置くための共創申請を送信します",
   
   // 管理画面
   ADMIN_PAGE_TITLE: "承認管理",
-  PENDING_SPOTS_TITLE: "承認待ちの発見報告",
+  PENDING_SPOTS_TITLE: "承認待ちの記録",
   NO_PENDING_SPOTS: "承認待ちはありません",
   ADMIN_REQUIRED_MESSAGE: "管理者権限が必要です",
   ADMIN_ADD_INSTRUCTIONS: "管理者を追加する方法:",
@@ -229,6 +242,8 @@ export const EXTERNAL_URLS = {
   GOOGLE_STREETVIEW: "https://maps.googleapis.com/maps/api/streetview",
   INSTAGRAM_MEDIA: "https://www.instagram.com/p",
   THREADS: "", // コミュニティ用。必要に応じて設定
+  /** お問い合わせ（Google フォーム） */
+  CONTACT_FORM: "https://forms.gle/9BctdNRMvT8kA1MD8",
 } as const
 
 // スポットマージ設定
@@ -277,6 +292,19 @@ export const SPOT_MARKER_STYLES = {
     size: 24,
     border: "2px dashed #6b7280",
     animation: null,
+  },
+} as const
+
+// AhhHum Phase1: 曖昧サークル
+export const AHHHUM_CONFIG = {
+  CIRCLE_RADIUS_M: 50,
+  FRESHNESS_HOURS_HIGH: 24, // 24h以内 = 高鮮度（赤系）
+  FRESHNESS_DAYS_MEDIUM: 7, // 7日以内 = 中鮮度（黄系）
+  // 7日超 = 低鮮度（グレー系）
+  CIRCLE_COLORS: {
+    HIGH: "#dc2626", // 赤系
+    MEDIUM: "#eab308", // 黄系
+    LOW: "#6b7280", // グレー
   },
 } as const
 

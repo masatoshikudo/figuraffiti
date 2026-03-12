@@ -38,7 +38,7 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
               <MapPin className="h-5 w-5" />
             </div>
             <span className={getTypography({ size: "xl", weight: "bold" }) + " tracking-tight"}>
-              <span className="mr-1">🎨</span>Figuraffiti
+              AhhHum
             </span>
           </div>
 
@@ -57,7 +57,7 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
                     <MapPin className="h-4 w-4" />
                   </div>
                   <span className="tracking-tight">
-                    <span className="mr-1">🎨</span>Figuraffiti
+                    AhhHum
                   </span>
                 </SheetTitle>
               </SheetHeader>
@@ -93,7 +93,7 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
 
                 {/* マップボタン */}
                 <Button size="sm" className="font-bold w-full justify-start" asChild>
-                  <Link href="/mapping" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/discover/mapping" onClick={() => setMobileMenuOpen(false)}>
                     <Map className="mr-2 h-4 w-4" />
                     マップを見る
                   </Link>
@@ -131,7 +131,7 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
                 <MapPin className="h-4 w-4" />
               </div>
               <span className="tracking-tight">
-                <span className="mr-1">🎨</span>Figuraffiti
+                AhhHum
               </span>
             </Link>
 
@@ -169,7 +169,7 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
 
             {/* マップボタン */}
             <Button size="sm" className="font-bold" asChild>
-              <Link href="/mapping">
+              <Link href="/discover/mapping">
                 <Map className="mr-2 h-4 w-4" />
                 マップを見る
               </Link>

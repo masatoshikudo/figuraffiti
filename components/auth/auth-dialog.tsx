@@ -46,9 +46,11 @@ interface AuthDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultTab?: 'login' | 'signup'
+  /** 認証ゲート用: 要認証の理由（例: 「発見を記録するにはログインが必要です」） */
+  gateMessage?: string
 }
 
-export function AuthDialog({ open, onOpenChange, defaultTab = 'login' }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange, defaultTab = 'login', gateMessage }: AuthDialogProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>(defaultTab)
   const { signIn, signUp } = useAuth()
   const { toast } = useToast()
@@ -81,7 +83,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'login' }: AuthDia
     } else {
       toast({
         title: 'ログインしました',
-        description: 'ようこそ、Skaterightへ！',
+        description: 'ようこそ！',
       })
       onOpenChange(false)
       loginForm.reset()
@@ -121,7 +123,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'login' }: AuthDia
         <DialogHeader>
           <DialogTitle>アカウント</DialogTitle>
           <DialogDescription>
-            ログインまたは新規アカウントを作成してください
+            {gateMessage ?? "ログインまたは新規アカウントを作成してください"}
           </DialogDescription>
         </DialogHeader>
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')}>

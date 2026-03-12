@@ -46,19 +46,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 各スポットのメディアを取得
-    const spotsWithMedia = await Promise.all(
-      (spots || []).map(async (spot) => {
-        const { data: media } = await supabase!
-          .from("spot_media")
-          .select("*")
-          .eq("spot_id", spot.id)
-          .order("created_at", { ascending: true })
-
-        return dbToSpot(spot, media || [])
-      })
-    )
-
+    const spotsWithMedia = (spots || []).map((spot) => dbToSpot(spot))
     return NextResponse.json(spotsWithMedia)
   } catch (error) {
     console.error("Unexpected error:", error)

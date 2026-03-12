@@ -4,23 +4,9 @@
 
 import type { Database } from "@/lib/database.types"
 
-// Supabaseのデータベーススキーマから生成された型を使用
-// ただし、実際のスキーマではtitle, skater, trickはnullを許可しているため、型を調整
-// 承認制関連のカラムも追加
-export type DbSpot = Omit<Database["public"]["Tables"]["spots"]["Row"], "title" | "skater" | "trick"> & {
-  title: string | null
-  skater: string | null
-  trick: string | null
-  address?: string | null // 住所（逆ジオコーディングで取得）
-  updated_at?: string | null // 更新日時
-  // 承認制関連のフィールド（マイグレーションで追加されたカラム）
-  status?: "pending" | "approved" | "rejected" | null
-  submitted_by?: string | null
-  approved_by?: string | null
-  approved_at?: string | null
-  rejection_reason?: string | null
-}
-export type DbSpotMedia = Database["public"]["Tables"]["spot_media"]["Row"]
+export type DbCoCreateSubmission = Database["public"]["Tables"]["co_create_submissions"]["Row"]
+export type DbSpot = Database["public"]["Tables"]["spots"]["Row"]
+export type DbNfcTag = Database["public"]["Tables"]["nfc_tags"]["Row"]
 
 // Supabaseエラーの型定義
 export interface SupabaseError {

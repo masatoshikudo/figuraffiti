@@ -1,12 +1,17 @@
-/**
- * Figuraffiti キャラクター（QR/NFCの飛び先）
- */
-export interface Character {
+export interface CharacterDiscoveryEntry {
   id: string
+  discoveredAt: string
+  userName: string
+}
+
+export interface Character {
   slug: string
   name: string
-  story: string | null
-  imageUrl: string | null
-  createdAt: string
-  updatedAt: string | null
+  spotId: string
+  spotNumber?: number | null
+  locationName: string
+  context?: string | null
+  coverUrl?: string | null
+  lastSeen?: string | null
+  discoveries: CharacterDiscoveryEntry[]
 }

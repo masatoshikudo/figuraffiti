@@ -48,14 +48,16 @@ export function logApiError(
   const errorCode = error.code
   const errorHint = error.hint
   const errorDetails = error.details
+  const status = response?.status ?? (error as { status?: number }).status
 
+  // ステータス・メッセージを必ず含め、「{}」だけのログを防ぐ
   console.error(`${context} error:`, {
+    status: status ?? "unknown",
     message: errorMessage,
-    code: errorCode,
-    hint: errorHint,
-    details: errorDetails,
-    status: response?.status,
-    fullError: error, // デバッグ用に完全なエラーオブジェクトも出力
+    code: errorCode ?? null,
+    hint: errorHint ?? null,
+    details: errorDetails ?? null,
+    fullError: error,
   })
 
   if (process.env.NODE_ENV === "development") {

@@ -16,7 +16,7 @@ export function SiteFooter() {
                 <MapPin className="h-5 w-5" />
               </div>
               <span className={combineTokens(getTypography({ size: "xl", weight: "bold" }), "tracking-tight")}>
-                Figuraffiti
+                AhhHum
               </span>
             </div>
             <h3 className={combineTokens("mb-6 tracking-tight", getTypography({ size: "3xl", weight: "bold" }))}>
@@ -25,13 +25,13 @@ export function SiteFooter() {
               物語を
             </h3>
             <p className={combineTokens("mb-8 max-w-md text-muted-foreground")}>
-              街に隠れた立体グラフィティを探し、発見を記録・共有する。
+              街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創していく。
               <br />
-              承認された報告がマップに表示されます。
+              曖昧なサークルと NFC / QR が、探索の入口になります。
             </p>
             <div className={combineTokens("flex", getSpacingClasses({ gap: "02" }))}>
               <Button size="lg" className="font-bold" asChild>
-                <Link href="/mapping">
+                <Link href="/discover/mapping">
                   マップを見る
                 </Link>
               </Button>
@@ -49,8 +49,13 @@ export function SiteFooter() {
             </h4>
             <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
               <li>
+                <Link href="/education" className="text-muted-foreground hover:text-primary transition-colors">
+                  遊び方（ゲームフロー）
+                </Link>
+              </li>
+              <li>
                 <Link href="/how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
-                  探し方
+                  探し方・発見記録
                 </Link>
               </li>
               <li>
@@ -59,7 +64,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/mapping" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/discover/mapping" className="text-muted-foreground hover:text-primary transition-colors">
                   マップを見る
                 </Link>
               </li>
@@ -73,13 +78,28 @@ export function SiteFooter() {
                 getTypography({ size: "sm", weight: "bold" }),
               )}
             >
-              規約
+              規約・お問い合わせ
             </h4>
             <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
               <li>
                 <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
                   利用規約
                 </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                  プライバシーポリシー
+                </Link>
+              </li>
+              <li>
+                <a
+                  href={EXTERNAL_URLS.CONTACT_FORM}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  お問い合わせ
+                </a>
               </li>
             </ul>
           </div>
@@ -92,7 +112,7 @@ export function SiteFooter() {
           )}
         >
           <p className={combineTokens("text-muted-foreground", getTypography({ size: "xs" }))}>
-            © 2025 Skateright. All rights reserved.
+            © 2025 AhhHum. All rights reserved.
           </p>
           <div className={combineTokens("flex", getSpacingClasses({ gap: "02" }))}>
             <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
