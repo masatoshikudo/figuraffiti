@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { headers } from "next/headers"
 import { SiteHeader } from "@/components/layout/site-header"
@@ -108,43 +109,43 @@ const PREFECTURE_BY_SLUG: Record<string, string> = {
   okinawa: "沖縄県",
 } as const
 
-const valuePillars = [
+const ahhHumPillars = [
   {
-    title: "ヒントから探せる",
-    body: "正確な場所はすぐに出ない。自分の感覚を頼りに探すほど、見つけた瞬間が気持ちよくなる。",
+    title: "街にひそんでいる",
+    body: "AhhHum は画面の中だけじゃない。ストリートの余白にひそみ、街のどこかでキミを待っている。",
   },
   {
-    title: "現地で見つけられる",
-    body: "画面の中だけで終わらない。街を歩いて自分で見つけるほど、発見がイベントになる。",
+    title: "見つけたら「タッチ」できる",
+    body: "フィギュアには NFC タグと QR コードがついている。見つけたキミだけが「タッチ」して、発見を記録できる。",
   },
   {
-    title: "見つけた証を残せる",
-    body: "見つけた AhhHum に「タッチ」したキミだけが、その発見の証を残せる。",
+    title: "いつまでそこにいるかわからない",
+    body: "AhhHum は、ずっと同じ場所にいるとは限らない。だからこそ、見つけた瞬間がキミだけの発見になる。",
   },
 ] as const
 
-const rewardSteps = [
+const searchSteps = [
   {
     step: "01",
-    title: "ヒントを見る",
-    body: "マップのサークルや手がかりから、次に向かう場所を定める。探索のスイッチが入る。",
+    title: "マップで手がかりを見る",
+    body: "正確なピンではなく、サークルやヒントから場所の気配をつかむ。どこにいるかを想像するところから始まる。",
   },
   {
     step: "02",
     title: "街を歩いて探す",
-    body: "街を歩きながら探すことで、ただ見るだけではない発見の緊張感と達成感が残る。",
+    body: "近くまで来たら、自分の目で周囲を観察する。普段は見過ごす街の余白が、探索の舞台に変わる。",
   },
   {
     step: "03",
-    title: "見つけたら「タッチ」する",
-    body: "「タッチ」したキミだけが、その発見の証を残せる。見つけた事実が自分のものになる。",
+    title: "見つけたら次へ進む",
+    body: "AhhHum を見つけたら、その場で「タッチ」へ。発見を記録することで、出会った事実が自分のものになる。",
   },
 ] as const
 
-const gettingStartedSteps = [
-  "マップを開く",
-  "気になるサークルを1つ選ぶ",
-  "見つけたら「タッチ」する",
+const touchSteps = [
+  "スポットの近くまで行く",
+  "QRを読み取る / NFCでタッチする",
+  "発見の証を記録する",
 ] as const
 
 function normalizePrefecture(value: string | null | undefined) {
@@ -299,7 +300,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              <figure className="mx-auto w-full max-w-[360px] space-y-3">
+              <figure className="mx-auto w-full max-w-[360px] space-y-3 lg:mx-0 lg:justify-self-end">
                 <div className="overflow-hidden rounded-[1.5rem] bg-black shadow-[0_18px_40px_rgba(28,34,40,0.08)]">
                 <video
                   className="aspect-[9/16] h-auto w-full object-cover"
@@ -318,37 +319,84 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="border-y border-border/70 bg-card/35">
-          <div className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
-            <div className="max-w-2xl space-y-4">
-              <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">What Is AhhHum</p>
-              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">AhhHum とは何か</h2>
-              <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                地図のヒントを頼りに街を歩き、自分で見つけて、発見を記録していく都市探索ゲーム。
-              </p>
-            </div>
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {valuePillars.map((pillar) => (
-                <div key={pillar.title} className="rounded-[2rem] border border-border/70 bg-background/75 p-6">
-                  <p className="text-sm font-medium uppercase tracking-[0.2em] text-brand-strong">Point</p>
-                  <h3 className="mt-4 text-xl font-semibold tracking-tight">{pillar.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{pillar.body}</p>
+        <section className="relative overflow-hidden border-y border-border/70 bg-card/35">
+          <div className="pointer-events-none absolute inset-y-0 left-0 hidden lg:flex items-center">
+            <Image
+              src="/Ahh.png"
+              alt=""
+              aria-hidden="true"
+              width={540}
+              height={1080}
+              className="-translate-x-[46%] h-auto w-[240px] xl:w-[300px]"
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 hidden lg:flex items-center">
+            <Image
+              src="/Hum.png"
+              alt=""
+              aria-hidden="true"
+              width={540}
+              height={1080}
+              className="translate-x-[46%] h-auto w-[240px] xl:w-[300px]"
+            />
+          </div>
+          <div className="container relative z-10 mx-auto max-w-5xl px-4 py-14 sm:py-16">
+            <div className="mx-auto max-w-3xl space-y-8">
+              <div className="max-w-2xl space-y-4">
+                <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">What Is AhhHum</p>
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">AhhHumって、なに？</h2>
+                <div className="relative min-h-40 lg:hidden">
+                  <div className="pointer-events-none absolute bottom-0 -left-4 overflow-hidden h-48 w-[7.5rem] sm:-left-6 sm:h-52 sm:w-36">
+                    <Image
+                      src="/Ahh.png"
+                      alt=""
+                      aria-hidden="true"
+                      width={120}
+                      height={240}
+                      className="h-full w-auto max-w-none -translate-x-[44%]"
+                    />
+                  </div>
+                  <div className="pointer-events-none absolute bottom-0 -right-4 overflow-hidden h-48 w-[7.5rem] sm:-right-6 sm:h-52 sm:w-36">
+                    <Image
+                      src="/Hum.png"
+                      alt=""
+                      aria-hidden="true"
+                      width={120}
+                      height={240}
+                      className="ml-auto h-full w-auto max-w-none translate-x-[44%]"
+                    />
+                  </div>
+                  <p className="relative z-10 px-10 pt-8 text-sm leading-7 text-muted-foreground sm:px-14">
+                    ストリートにひそんでる Ahh（アー） と Hum（ハム） の2種のケモノ。
+                  </p>
                 </div>
-              ))}
+                <p className="hidden text-base leading-7 text-muted-foreground sm:text-lg lg:block">
+                  ストリートにひそんでる Ahh（アー） と Hum（ハム） の2種のケモノ。
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {ahhHumPillars.map((pillar) => (
+                  <div key={pillar.title} className="rounded-[2rem] border border-border/70 bg-background/75 p-6">
+                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-brand-strong">Point</p>
+                    <h3 className="mt-4 text-xl font-semibold tracking-tight">{pillar.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{pillar.body}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
           <div className="max-w-2xl space-y-4">
-            <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">How It Works</p>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">見つけると、何が残る？</h2>
+            <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Find AhhHum</p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">どうやって探す？</h2>
             <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-              ヒントをたどって街で見つけ、「タッチ」したキミだけが、その発見の証を残せる。
+              まずはヒントを見て、次に街を歩いて、自分の目で探す。答えが最初から見えないからこそ、見つけた瞬間がうれしい。
             </p>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {rewardSteps.map((item) => (
+            {searchSteps.map((item) => (
               <div key={item.step} className="rounded-[2rem] border border-border/70 bg-card/60 p-6">
                 <p className="text-sm font-medium tracking-[0.24em] text-brand-strong">{item.step}</p>
                 <h3 className="mt-4 text-xl font-semibold tracking-tight">{item.title}</h3>
@@ -362,10 +410,10 @@ export default async function Home() {
           <div className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-center">
               <div className="space-y-4">
-                <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Get Started</p>
-                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">今すぐ探索を始めるには</h2>
+                <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Touch AhhHum</p>
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">見つけたら「タッチ」しよう</h2>
                 <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                  難しい準備は不要。マップを開いて、気になるサークルを 1 つ選び、近くまで歩いて探す。最初のプレイはそれで始まる。
+                  AhhHum を見つけたら、その場で記録へ。フィギュアの QR を読み取るか、対応端末なら NFC でタッチすると、現地で見つけた証が残る。
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
@@ -379,12 +427,12 @@ export default async function Home() {
                   </Button>
                 </div>
                 <p className="text-sm leading-6 text-muted-foreground">
-                  マップはログインなしで見られる。見つけたら「タッチ」して証を残そう。
+                  スポットや端末に応じて QR / NFC のどちらかで記録できる。見つけた人だけが、発見を自分の履歴として残せる。
                 </p>
               </div>
               <div className="rounded-[2rem] border border-border/70 bg-background/80 p-6 sm:p-7">
                 <ol className="space-y-4">
-                  {gettingStartedSteps.map((step, index) => (
+                  {touchSteps.map((step, index) => (
                     <li key={step} className="flex gap-4">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-sm font-semibold text-brand-strong">
                         {index + 1}
