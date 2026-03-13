@@ -6,40 +6,42 @@
 /* カードモーダル専用アニメーション（画面下からスライドイン） */
 
 :root {
-  /* Clean & Minimal theme - light silver with red accent */
-  --background: #f7f7f7;
-  --foreground: #111111;
-  --card: #ffffff;
-  --card-foreground: #111111;
-  --popover: #ffffff;
-  --popover-foreground: #111111;
-  --primary: #e53935;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f3f3;
-  --secondary-foreground: #111111;
-  --muted: #f3f3f3;
-  --muted-foreground: #555555;
-  --accent: #e53935;
-  --accent-foreground: #ffffff;
-  --destructive: #e53935;
-  --destructive-foreground: #ffffff;
-  --border: #e5e5e5;
-  --input: #ffffff;
-  --ring: #e53935;
-  --chart-1: #e53935;
-  --chart-2: #555555;
-  --chart-3: #111111;
-  --chart-4: #f3f3f3;
-  --chart-5: #f7f7f7;
-  --radius: 0.5rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #111111;
-  --sidebar-primary: #e53935;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f3f3f3;
-  --sidebar-accent-foreground: #111111;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #e53935;
+  /* AhhHum theme - concrete silver with urban material contrast */
+  --background: #dfe3e7;
+  --foreground: #1c2228;
+  --card: #eef1f4;
+  --card-foreground: #1c2228;
+  --popover: #f5f7f8;
+  --popover-foreground: #1c2228;
+  --primary: #4d7485;
+  --primary-foreground: #f5f7f8;
+  --secondary: #d3d8dd;
+  --secondary-foreground: #222a31;
+  --muted: #e8edf1;
+  --muted-foreground: #4f5a65;
+  --accent: #c7ced6;
+  --accent-foreground: #1c2228;
+  --destructive: #a44a42;
+  --destructive-foreground: #fff7f2;
+  --border: #a3adb8;
+  --input: #f5f7f8;
+  --ring: #4d7485;
+  --brand: #8a7a63;
+  --brand-strong: #6f614e;
+  --chart-1: #4d7485;
+  --chart-2: #8a7a63;
+  --chart-3: #1c2228;
+  --chart-4: #a3adb8;
+  --chart-5: #f5f7f8;
+  --radius: 1rem;
+  --sidebar: #eef1f4;
+  --sidebar-foreground: #1c2228;
+  --sidebar-primary: #4d7485;
+  --sidebar-primary-foreground: #f5f7f8;
+  --sidebar-accent: #d3d8dd;
+  --sidebar-accent-foreground: #222a31;
+  --sidebar-border: #a3adb8;
+  --sidebar-ring: #4d7485;
 
   /* Design System Tokens - Spacing (8px base grid) */
   --spacing-01: 0.5rem;  /* 8px */
@@ -93,6 +95,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -132,12 +136,52 @@
     @apply border-border outline-ring/50;
     box-sizing: border-box;
   }
-  h2 {
-    padding-top: var(--spacing-03);
-    padding-bottom: var(--spacing-03);
-  }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top, rgba(138, 122, 99, 0.14), transparent 30%),
+      radial-gradient(circle at 20% 20%, rgba(77, 116, 133, 0.1), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(223, 227, 231, 0.08));
+    min-height: 100vh;
+    line-height: var(--line-height-normal);
+  }
+
+  ::selection {
+    background: rgba(77, 116, 133, 0.2);
+    color: var(--foreground);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  a,
+  button,
+  [role="button"],
+  input,
+  textarea,
+  select {
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ring) 78%, white);
+    outline-offset: 3px;
   }
 }
 
@@ -452,8 +496,8 @@
 /* Custom Grid Background */
 .bg-grid-pattern {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-    linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(28, 34, 40, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 34, 40, 0.08) 1px, transparent 1px);
   mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
 }
 

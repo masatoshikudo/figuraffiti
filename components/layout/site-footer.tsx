@@ -1,38 +1,47 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { MapPin, Twitter, Instagram, Github } from "lucide-react"
+import { Compass, Mail, MapPin, ShieldCheck } from "lucide-react"
 import { getSpacingClasses, getTypography, combineTokens, getGridClasses } from "@/lib/design/design-tokens"
 import { EXTERNAL_URLS } from "@/lib/constants"
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-card">
+    <footer
+      className="border-t border-white/10 bg-[linear-gradient(180deg,rgba(68,79,90,0.94),rgba(54,64,73,0.97))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md [--border:rgba(255,255,255,0.14)] [--card:rgba(255,255,255,0.04)] [--foreground:#f5f7f8] [--muted-foreground:#c6d0d8] [--brand:#d0bf9f] [--brand-strong:#f1e5cf]"
+    >
       <div className={combineTokens("container mx-auto", getSpacingClasses({ px: "02", py: "08" }), "md:py-spacing-10")}>
         <div className={combineTokens(getGridClasses({ cols: 4, gap: "loose", responsive: true }), "lg:grid-cols-4")}>
           <div className="lg:col-span-2">
             <div className={combineTokens("mb-6 flex items-center", getSpacingClasses({ gap: "01" }))}>
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <MapPin className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-brand">
+                <MapPin className="h-4 w-4" />
               </div>
-              <span className={combineTokens(getTypography({ size: "xl", weight: "bold" }), "tracking-tight")}>
-                AhhHum
-              </span>
+              <div>
+                <p className={combineTokens(getTypography({ size: "xs", weight: "medium" }), "uppercase tracking-[0.24em] text-brand-strong")}>
+                  Urban Trace
+                </p>
+                <span className={combineTokens(getTypography({ size: "xl", weight: "bold" }), "tracking-tight")}>AhhHum</span>
+              </div>
             </div>
-            <h3 className={combineTokens("mb-6 tracking-tight", getTypography({ size: "3xl", weight: "bold" }))}>
-              都市の余白に
+            <h3 className={combineTokens("mb-6 tracking-tight text-balance", getTypography({ size: "3xl", weight: "bold" }))}>
+              気になる場所を、
               <br />
-              物語を
+              歩いて見つける。
             </h3>
-            <p className={combineTokens("mb-8 max-w-md text-muted-foreground")}>
-              街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創していく。
+            <p className={combineTokens("mb-8 max-w-md leading-7 text-muted-foreground")}>
+              地図で気配を見つけて、現地で確かめて、発見を記録する。
               <br />
-              曖昧なサークルと NFC / QR が、探索の入口になります。
+              AhhHum は、その流れをシンプルに楽しめる場所です。
             </p>
-            <div className={combineTokens("flex", getSpacingClasses({ gap: "02" }))}>
-              <Button size="lg" className="font-bold" asChild>
+            <div className={combineTokens("flex flex-wrap", getSpacingClasses({ gap: "02" }))}>
+              <Button className="rounded-full px-6 font-bold" asChild>
                 <Link href="/discover/mapping">
-                  マップを見る
+                  マップで探し始める
+                </Link>
+              </Button>
+              <Button variant="outline" className="rounded-full border-white/20 bg-white/6 px-6 text-white hover:bg-white/10" asChild>
+                <Link href="/education">
+                  遊び方を見る
                 </Link>
               </Button>
             </div>
@@ -45,26 +54,31 @@ export function SiteFooter() {
                 getTypography({ size: "sm", weight: "bold" }),
               )}
             >
-              使い方
+              はじめての方へ
             </h4>
             <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
               <li>
-                <Link href="/education" className="text-muted-foreground hover:text-primary transition-colors">
-                  遊び方（ゲームフロー）
+                <Link href="/education" className="text-muted-foreground transition-colors hover:text-brand">
+                  遊び方を見る
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
-                  探し方・発見記録
+                <Link href="/how-it-works" className="text-muted-foreground transition-colors hover:text-brand">
+                  発見記録の流れ
                 </Link>
               </li>
               <li>
-                <Link href="/guidelines" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/guidelines" className="text-muted-foreground transition-colors hover:text-brand">
                   ガイドライン
                 </Link>
               </li>
               <li>
-                <Link href="/discover/mapping" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/about" className="text-muted-foreground transition-colors hover:text-brand">
+                  世界観
+                </Link>
+              </li>
+              <li>
+                <Link href="/discover/mapping" className="text-muted-foreground transition-colors hover:text-brand">
                   マップを見る
                 </Link>
               </li>
@@ -78,30 +92,44 @@ export function SiteFooter() {
                 getTypography({ size: "sm", weight: "bold" }),
               )}
             >
-              規約・お問い合わせ
+              安心して使う
             </h4>
-            <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
-              <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
-                  利用規約
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
-                  プライバシーポリシー
-                </Link>
-              </li>
-              <li>
-                <a
-                  href={EXTERNAL_URLS.CONTACT_FORM}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  お問い合わせ
-                </a>
-              </li>
-            </ul>
+            <div className="space-y-4">
+              <div className="rounded-3xl border border-white/12 bg-white/6 p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 text-brand" />
+                  <p className={combineTokens(getTypography({ size: "sm" }), "leading-6 text-muted-foreground")}>
+                    私有地への立ち入りや危険行為を促さない、街歩き前提の探索体験です。
+                  </p>
+                </div>
+              </div>
+              <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
+                <li>
+                  <Link href="/terms" className="text-muted-foreground transition-colors hover:text-brand">
+                    利用規約
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="text-muted-foreground transition-colors hover:text-brand">
+                    プライバシーポリシー
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/guidelines" className="text-muted-foreground transition-colors hover:text-brand">
+                    安全に楽しむためのガイド
+                  </Link>
+                </li>
+              </ul>
+              <a
+                href={EXTERNAL_URLS.CONTACT_FORM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-brand"
+              >
+                <Mail className="h-4 w-4" />
+                お問い合わせ
+              </a>
+            </div>
           </div>
         </div>
 
@@ -114,31 +142,11 @@ export function SiteFooter() {
           <p className={combineTokens("text-muted-foreground", getTypography({ size: "xs" }))}>
             © 2025 AhhHum. All rights reserved.
           </p>
-          <div className={combineTokens("flex", getSpacingClasses({ gap: "02" }))}>
-            <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
-            </Link>
-            <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Instagram className="h-5 w-5" />
-              <span className="sr-only">Instagram</span>
-            </Link>
-            <Link href={EXTERNAL_URLS.THREADS || "#"} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
-              <Image
-                src="/threads-logo-black.svg"
-                alt="Threads"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-                loading="lazy"
-              />
-              <span className="sr-only">Threads</span>
-            </Link>
-            {/* Discord 連携は無効（外部連携を切断） */}
-            <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Github className="h-5 w-5" />
-              <span className="sr-only">GitHub</span>
-            </Link>
+          <div className={combineTokens("flex items-center", getSpacingClasses({ gap: "02" }))}>
+            <Compass className="h-4 w-4 text-brand" />
+            <p className={combineTokens("text-muted-foreground", getTypography({ size: "xs" }))}>
+              ヒントを見て歩き、現地で確かめるシンプルな導線に整えています。
+            </p>
           </div>
         </div>
       </div>

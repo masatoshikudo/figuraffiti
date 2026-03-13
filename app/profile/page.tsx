@@ -119,9 +119,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SiteHeader />
+      <SiteHeader variant="overlay" />
 
-      <ScrollArea className="flex-1 pb-20">
+      <ScrollArea className="flex-1 pt-24 pb-20">
         <main className="container max-w-6xl mx-auto p-4 space-y-6">
           {/* プロフィール情報セクション */}
           <Card>

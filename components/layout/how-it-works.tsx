@@ -17,6 +17,9 @@ export function HowItWorks() {
       )}
     >
       <div className={combineTokens("mb-16 text-center", getSpacingClasses({ mb: "08" }))}>
+        <p className={combineTokens("mb-3 font-medium uppercase tracking-[0.24em] text-brand-strong", getTypography({ size: "xs" }))}>
+          How It Works
+        </p>
         <h2
           className={combineTokens(
             "tracking-tight",
@@ -25,15 +28,23 @@ export function HowItWorks() {
             getSpacingClasses({ mb: "02" })
           )}
         >
-          <span className="inline-block mr-2">🗺️</span>
           <span className="block md:inline">発見記録は</span>
           <span className="text-primary block md:inline">2ステップ</span>
         </h2>
-        <p className={combineTokens(getTypography({ size: "lg" }), "text-muted-foreground")}>
-          AhhHum では、まずマップで痕跡を探し、
-          <br />
-          現地で NFC / QR を通じて発見を記録します。
+        <p className={combineTokens("mx-auto max-w-2xl", getTypography({ size: "lg" }), "leading-8 text-muted-foreground")}>
+          ログイン不要でマップを見て、気になるサークルを 1 つ選ぶ。現地で見つけたら「タッチ」して、その場で発見を記録します。
         </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm text-muted-foreground">
+            ログイン不要でマップ閲覧
+          </span>
+          <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm text-muted-foreground">
+            ヒントを頼りに街を歩く
+          </span>
+          <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm text-muted-foreground">
+            見つけたらその場で記録
+          </span>
+        </div>
       </div>
 
       <div className={getGridClasses({ cols: 2, gap: "default", responsive: true })}>
@@ -61,10 +72,11 @@ export function HowItWorks() {
             >
               ① マップで探す
             </h3>
-            <ul className={combineTokens("space-y-2", getTypography({ size: "sm" }), "text-muted-foreground")}>
-              <li>曖昧なサークルとヒントを手がかりに、街の中の痕跡を探します。</li>
-              <li>正確な場所は表示されず、自分の足と目で探索する体験が中心です。</li>
-              <li>Last Seen とティッカーが、今も世界が動いていることを伝えます。</li>
+            <ul className={combineTokens("space-y-3 leading-7", getTypography({ size: "sm" }), "text-muted-foreground")}>
+              <li>マップ閲覧はログイン不要。まずは気になるサークルを 1 つ選ぶところから始められます。</li>
+              <li>曖昧なサークルと短いヒントを手がかりに、行ってみたい場所を選びます。</li>
+              <li>正確な場所は表示されないため、スマホだけで完結せず街歩きそのものを楽しめます。</li>
+              <li>Last Seen とティッカーが、いま動いている気配を伝えます。</li>
             </ul>
           </div>
         </div>
@@ -93,15 +105,15 @@ export function HowItWorks() {
             >
               ② 現地で記録する
             </h3>
-            <ul className={combineTokens("space-y-2", getTypography({ size: "sm" }), "text-muted-foreground")}>
-              <li>NFC / QR を読み取ると、その場で発見記録が作成されます。</li>
-              <li>成功すると Last Seen が更新され、ティッカーにも反映されます。</li>
-              <li>今後は発見順、FTF、デジタルタグなどの演出がここに加わります。</li>
+            <ul className={combineTokens("space-y-3 leading-7", getTypography({ size: "sm" }), "text-muted-foreground")}>
+              <li>見つけたら NFC / QR を読み取り、「タッチ」してその場で発見記録を残します。</li>
+              <li>記録が反映されると Last Seen やティッカーにも変化が出て、探索の手応えが残ります。</li>
+              <li>今後は発見順やバッジなど、見つけた人だけの演出も順次追加予定です。</li>
             </ul>
 
             <div
               className={combineTokens(
-                "mt-6 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-3",
+                "mt-6 flex items-center gap-2 rounded-2xl bg-primary/5 px-4 py-3",
                 getTypography({ size: "sm" })
               )}
             >

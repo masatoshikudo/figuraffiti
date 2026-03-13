@@ -11,14 +11,14 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AhhHum — 都市の余白に物語を。",
+  title: "AhhHum | 気になる場所を、歩いて見つける。",
   description:
-    "街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創する体験プラットフォーム。",
+    "街の気配を見つけて、歩いて確かめ、発見を記録できるサービス。",
   generator: "v0.app",
   openGraph: {
-    title: "AhhHum — 都市の余白に物語を。",
+    title: "AhhHum | 気になる場所を、歩いて見つける。",
     description:
-      "街に潜む痕跡を探し、発見を記録し、都市探索の物語を共創する体験プラットフォーム。",
+      "街の気配を見つけて、歩いて確かめ、発見を記録できるサービス。",
     url: "https://ahhhum.com",
     type: "website",
     images: ["/ogp.jpg"],
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: "#1C1C1C",
+  themeColor: "#dfe3e7",
 }
 
 export default function RootLayout({

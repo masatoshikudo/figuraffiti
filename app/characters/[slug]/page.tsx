@@ -23,8 +23,8 @@ export default async function CharacterPage({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SiteHeader />
-      <main className="flex-1 container max-w-4xl mx-auto px-4 py-10 space-y-8">
+      <SiteHeader variant="overlay" />
+      <main className="flex-1 container max-w-4xl mx-auto px-4 pt-24 pb-10 space-y-8">
         <div className="space-y-3">
           <p className="text-sm font-medium text-primary">Character</p>
           <h1 className="text-4xl font-bold tracking-tight">{character.name}</h1>

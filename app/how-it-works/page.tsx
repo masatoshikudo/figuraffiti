@@ -8,20 +8,20 @@ import { getSpacingClasses, getTypography, combineTokens } from "@/lib/design/de
 export default function HowItWorksPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main className="flex-1">
+      <SiteHeader variant="overlay" />
+      <main className="flex-1 pt-24">
         <HowItWorks />
         <div className={combineTokens("container mx-auto text-center", getSpacingClasses({ px: "02", py: "08" }))}>
           <div className="space-y-4">
             <p className={combineTokens(getTypography({ size: "lg" }), "text-muted-foreground")}>
-              発見記録のルールやFAQについては、<Link href="/guidelines" className="text-primary hover:underline">ガイドライン</Link>をご覧ください。
+              発見記録のルールや安全面の確認は、<Link href="/guidelines" className="text-primary hover:underline">ガイドライン</Link>からすぐに確認できます。
             </p>
             <div className={combineTokens("flex justify-center gap-4", getSpacingClasses({ gap: "02" }))}>
-              <Button size="lg" asChild>
-                <Link href="/discover/mapping">マップで探す</Link>
+              <Button size="lg" className="rounded-full px-8" asChild>
+                <Link href="/discover/mapping">マップで探し始める</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/guidelines">ガイドライン</Link>
+              <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
+                <Link href="/guidelines">安全に楽しむポイント</Link>
               </Button>
             </div>
           </div>

@@ -132,6 +132,10 @@ DROP POLICY IF EXISTS "Allow trusted users to submit approved spots" ON spots;
 DROP POLICY IF EXISTS "Admins can select all spots" ON spots;
 DROP POLICY IF EXISTS "Admins can update all spots" ON spots;
 DROP POLICY IF EXISTS "Admins can delete all spots" ON spots;
+DROP POLICY IF EXISTS "Read approved spots" ON spots;
+DROP POLICY IF EXISTS "Users see own submissions" ON spots;
+DROP POLICY IF EXISTS "Authenticated insert pending" ON spots;
+DROP POLICY IF EXISTS "Admins full access" ON spots;
 
 CREATE POLICY "Read approved spots" ON spots
   FOR SELECT USING (status = 'approved' OR status IS NULL);
@@ -157,6 +161,8 @@ CREATE POLICY "Admins full access" ON spots
 -- discovery_logs
 DROP POLICY IF EXISTS "Allow public read discovery logs" ON discovery_logs;
 DROP POLICY IF EXISTS "Authenticated users can insert discovery logs" ON discovery_logs;
+DROP POLICY IF EXISTS "Read discovery logs" ON discovery_logs;
+DROP POLICY IF EXISTS "Insert own discovery" ON discovery_logs;
 
 CREATE POLICY "Read discovery logs" ON discovery_logs
   FOR SELECT USING (true);
@@ -246,6 +252,7 @@ GRANT EXECUTE ON FUNCTION record_discovery_by_token(TEXT) TO authenticated;
 
 -- admin_users
 DROP POLICY IF EXISTS "Admins can view their own admin status" ON admin_users;
+DROP POLICY IF EXISTS "Admins see self" ON admin_users;
 CREATE POLICY "Admins see self" ON admin_users
   FOR SELECT USING (auth.uid() = user_id);
 
@@ -253,6 +260,7 @@ CREATE POLICY "Admins see self" ON admin_users
 DROP POLICY IF EXISTS "Users can read their own profile" ON user_profiles;
 DROP POLICY IF EXISTS "Users can update their own profile" ON user_profiles;
 DROP POLICY IF EXISTS "Users can insert their own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users manage own profile" ON user_profiles;
 
 CREATE POLICY "Users manage own profile" ON user_profiles
   FOR ALL USING (auth.uid() = user_id);
@@ -297,6 +305,7 @@ CREATE TRIGGER update_spots_updated_at
   FOR EACH ROW EXECUTE PROCEDURE update_updated_at();
 
 DROP TRIGGER IF EXISTS trigger_update_user_profiles_updated_at ON user_profiles;
+DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
 CREATE TRIGGER update_user_profiles_updated_at
   BEFORE UPDATE ON user_profiles
   FOR EACH ROW EXECUTE PROCEDURE update_updated_at();

@@ -74,8 +74,8 @@ const phases = [
 export default function EducationPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main className="flex-1">
+      <SiteHeader variant="overlay" />
+      <main className="flex-1 pt-24">
         {/* Hero */}
         <section
           className={combineTokens(
@@ -93,11 +93,16 @@ export default function EducationPage() {
                 getSpacingClasses({ mb: "03" }),
               )}
             >
-              究極の都市探索体験
+              AhhHum の遊び方
             </h1>
-            <p className={combineTokens(getTypography({ size: "lg" }), "text-muted-foreground", getSpacingClasses({ mb: "06" }))}>
-              AhhHum は「情報収集 → 推理と探索 → 達成とマーキング → 次なる謎」のゲームループで、街を舞台にした謎解きとデジタルタギングを体験できます。
+            <p className={combineTokens("leading-8", getTypography({ size: "lg" }), "text-muted-foreground", getSpacingClasses({ mb: "06" }))}>
+              ヒントを見る、現地で探す、見つけたことを残す。AhhHum は、その流れを街歩きの楽しさとして味わうためのサービスです。
             </p>
+            <div className="mb-6 flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
+              <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2">まずはマップ閲覧から</span>
+              <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2">答えは現地で見つける</span>
+              <span className="rounded-full border border-border/70 bg-card/70 px-4 py-2">発見をその場で記録</span>
+            </div>
             <div className="flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">4つのフェーズ：</span>
               <span>噂の探知</span>
@@ -139,7 +144,7 @@ export default function EducationPage() {
                       </h2>
                     </div>
                   </div>
-                  <p className={combineTokens(getTypography({ size: "sm" }), "text-muted-foreground", getSpacingClasses({ mb: "05" }))}>
+                  <p className={combineTokens(getTypography({ size: "sm" }), "leading-7 text-muted-foreground", getSpacingClasses({ mb: "05" }))}>
                     <strong className="text-foreground">目的：</strong>
                     {phase.purpose}
                   </p>
@@ -151,7 +156,7 @@ export default function EducationPage() {
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                             <StepIcon className="h-4 w-4" />
                           </span>
-                          <span className={combineTokens(getTypography({ size: "sm" }), "text-muted-foreground pt-0.5")}>
+                          <span className={combineTokens(getTypography({ size: "sm" }), "pt-0.5 leading-7 text-muted-foreground")}>
                             {step.text}
                           </span>
                         </li>
@@ -179,13 +184,13 @@ export default function EducationPage() {
               ストリートカルチャーに根ざした体験を目指しています。
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/discover/mapping">マップで探す</Link>
+              <Button size="lg" className="rounded-full px-8" asChild>
+                <Link href="/discover/mapping">マップで探し始める</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
                 <Link href="/how-it-works">発見記録の流れ</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
                 <Link href="/guidelines">ガイドライン</Link>
               </Button>
             </div>

@@ -142,10 +142,10 @@ export default function ApplyPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SiteHeader />
+      <SiteHeader variant="overlay" />
       <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
 
-      <main className="flex-1 container max-w-2xl mx-auto p-4 space-y-6">
+      <main className="flex-1 container max-w-2xl mx-auto p-4 pt-24 space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">{UI_TEXT.APPLY_PAGE_TITLE}</h1>
           <p className="text-muted-foreground">{UI_TEXT.APPLY_PAGE_DESCRIPTION}</p>
