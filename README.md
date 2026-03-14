@@ -20,6 +20,7 @@
 ```bash
 # 1. 環境変数 — ルートに .env.local を作成
 # NEXT_PUBLIC_MAPBOX_TOKEN, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY を設定
+# Google Places を使う場合は GOOGLE_PLACES_API_KEY を設定
 
 # 2. 依存関係
 npm install

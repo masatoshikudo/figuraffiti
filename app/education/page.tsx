@@ -5,8 +5,8 @@ import Link from "next/link"
 import {
   Radio,
   Footprints,
-  QrCode,
   Sparkles,
+  Map,
   MapPin,
   Instagram,
   CircleDot,
@@ -48,10 +48,10 @@ const phases = [
     number: 3,
     nameJa: "発見と刻印",
     nameEn: "Tagging",
-    icon: QrCode,
+    icon: Radio,
     purpose: "発見の証をデジタル空間に刻み込み、自己顕示欲と所有欲を満たす。",
     steps: [
-      { icon: QrCode, text: "フィギュアに付いたQRコードをスマホで読み取る。" },
+      { icon: Radio, text: "フィギュアに埋め込まれたNFCタグにスマホをかざす。" },
       { icon: Trophy, text: "FTFなら「First to Find 達成！」のバッジ。2番目以降は「あなたは #42 番目の発見者です」とシリアル表示。" },
       { icon: Hash, text: "キャラページにデジタルタグ（ストリートネームや一言）と発見時の写真・動画を残す。" },
       { icon: LayoutGrid, text: "キャラページは訪れた人たちのタグで埋まる「デジタル上の壁」になり、熱量が可視化される。" },
@@ -185,7 +185,10 @@ export default function EducationPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="rounded-full px-8" asChild>
-                <Link href="/discover/mapping">マップで探し始める</Link>
+                <Link href="/discover/mapping">
+                  <Map className="h-4 w-4" />
+                  マップで手がかりを見る
+                </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
                 <Link href="/how-it-works">発見記録の流れ</Link>

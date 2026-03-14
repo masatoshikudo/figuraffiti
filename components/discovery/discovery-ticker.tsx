@@ -1,35 +1,57 @@
 "use client"
 
-import type { DiscoveryLog } from "@/types/spot"
+import { useEffect, useRef, useState } from "react"
+import type { TickerItem } from "@/types/spot"
 import { cn } from "@/lib/utils"
 
 interface DiscoveryTickerProps {
-  discoveries: DiscoveryLog[]
+  items: TickerItem[]
   isLoading?: boolean
   className?: string
 }
 
 /**
- * グローバル・ティッカー: 発見ログを一行で流す
- * 表示形式: "User_X just found #N in [地名]."
+ * グローバル・ティッカー: 直近の世界の動きを一行で流す
  */
 export function DiscoveryTicker({
-  discoveries,
+  items,
   isLoading = false,
   className,
 }: DiscoveryTickerProps) {
+  const trackRef = useRef<HTMLDivElement | null>(null)
+  const [trackWidth, setTrackWidth] = useState(0)
+  const tickerItems =
+    items.length > 0
+      ? items
+      : [{ id: "loading", type: "discovery" as const, createdAt: "", locationName: "", message: "ティッカーを読み込み中..." }]
 
-  if (discoveries.length === 0 && !isLoading) {
+  useEffect(() => {
+    const element = trackRef.current
+    if (!element) return
+
+    const updateWidth = () => {
+      setTrackWidth(element.scrollWidth)
+    }
+
+    updateWidth()
+
+    const observer = new ResizeObserver(updateWidth)
+    observer.observe(element)
+
+    return () => observer.disconnect()
+  }, [tickerItems])
+
+  if (items.length === 0 && !isLoading) {
     return (
       <div
         className={cn(
           "h-10 px-4 flex items-center border-t border-border",
           "bg-background/95 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.05)]",
-          "text-sm text-muted-foreground",
+          "text-base text-muted-foreground",
           className
         )}
       >
-        No discoveries yet. Be the first.
+        まだ新しい動きはありません。
       </div>
     )
   }
@@ -37,30 +59,66 @@ export function DiscoveryTicker({
   return (
     <div
       className={cn(
-        "h-10 px-4 flex items-center border-t border-border overflow-x-auto overflow-y-hidden",
+        "h-10 px-4 flex items-center border-t border-border overflow-hidden",
         "bg-background/95 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.05)]",
-        "text-sm text-muted-foreground",
-        "scroll-smooth",
+        "text-base text-muted-foreground",
         className
       )}
       aria-live="polite"
     >
-      <div className="flex items-center gap-6 whitespace-nowrap">
-        {discoveries.map((d) => (
-          <span key={d.id} className="inline">
-            <span className="font-medium text-foreground">{d.userName}</span>
-            {" just found "}
-            {d.spotNumber != null ? (
-              <>
-                <span className="font-medium">#{d.spotNumber}</span>
-                {" in "}
-              </>
-            ) : null}
-            <span>{d.locationName}</span>
-            .
-          </span>
+      <div
+        className="ticker-marquee"
+        style={
+          trackWidth > 0
+            ? ({
+                ["--ticker-track-width" as string]: `${trackWidth}px`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        {[0, 1].map((loopIndex) => (
+          <div
+            key={loopIndex}
+            ref={loopIndex === 0 ? trackRef : undefined}
+            className="ticker-track flex items-center gap-6 whitespace-nowrap pr-6"
+            aria-hidden={loopIndex === 1}
+          >
+            {tickerItems.map((item) => (
+              <span key={`${loopIndex}-${item.id}`} className="inline-flex items-center gap-6">
+                <span className="font-medium text-foreground">{item.message}</span>
+                <span className="text-muted-foreground/60">•</span>
+              </span>
+            ))}
+          </div>
         ))}
       </div>
+      <style jsx>{`
+        .ticker-marquee {
+          display: flex;
+          width: max-content;
+          animation: ticker-marquee 42s linear infinite;
+          will-change: transform;
+        }
+
+        .ticker-track {
+          flex-shrink: 0;
+        }
+
+        @keyframes ticker-marquee {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(calc(-1 * var(--ticker-track-width, 0px)));
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ticker-marquee {
+            animation: none;
+          }
+        }
+      `}</style>
     </div>
   )
 }

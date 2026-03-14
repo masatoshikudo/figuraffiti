@@ -14,7 +14,8 @@
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
-    "supabase:db:run-full-schema": "node scripts/run-full-schema.mjs"
+    "supabase:db:run-full-schema": "node scripts/run-full-schema.mjs",
+    "supabase:db:backfill-circle-display": "node scripts/backfill-circle-display.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

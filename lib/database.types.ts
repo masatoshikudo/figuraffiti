@@ -102,6 +102,8 @@ export interface Database {
           prefecture: string | null
           lat: number
           lng: number
+          display_lat: number | null
+          display_lng: number | null
           status: string
           submitted_by: string | null
           approved_by: string | null
@@ -109,6 +111,7 @@ export interface Database {
           rejection_reason: string | null
           last_seen: string | null
           spot_number: number | null
+          visible_after: string | null
           cover_url: string | null
           created_at: string
           updated_at: string
@@ -120,6 +123,8 @@ export interface Database {
           prefecture?: string | null
           lat: number
           lng: number
+          display_lat?: number | null
+          display_lng?: number | null
           status?: string
           submitted_by?: string | null
           approved_by?: string | null
@@ -127,6 +132,7 @@ export interface Database {
           rejection_reason?: string | null
           last_seen?: string | null
           spot_number?: number | null
+          visible_after?: string | null
           cover_url?: string | null
           created_at?: string
           updated_at?: string
@@ -138,6 +144,8 @@ export interface Database {
           prefecture?: string | null
           lat?: number
           lng?: number
+          display_lat?: number | null
+          display_lng?: number | null
           status?: string
           submitted_by?: string | null
           approved_by?: string | null
@@ -145,6 +153,7 @@ export interface Database {
           rejection_reason?: string | null
           last_seen?: string | null
           spot_number?: number | null
+          visible_after?: string | null
           cover_url?: string | null
           created_at?: string
           updated_at?: string

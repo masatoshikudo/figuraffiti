@@ -6,6 +6,8 @@ export interface Spot {
   address?: string // 住所（逆ジオコーディングで取得、任意）
   lat: number
   lng: number
+  displayLat?: number | null
+  displayLng?: number | null
   media: {
     type: "cover" | "video" // 'article'は削除
     source: "Instagram" | "YouTube" | "Twitter" | "X" | "Threads" | "TikTok" | "Other"
@@ -23,6 +25,7 @@ export interface Spot {
   // AhhHum Phase1
   lastSeen?: string | null // 最終発見日時（鮮度表示用）
   spotNumber?: number | null // #N の N（ティッカー表示用）
+  visibleAfter?: string | null
   characterSlug?: string
 }
 
@@ -32,9 +35,19 @@ export interface DiscoveryLog {
   spotId: string
   userId: string
   discoveredAt: string
-  userName?: string // 表示名（Explorer_xxx または display_name）
+  userName?: string // 表示名
   spotNumber?: number
   locationName?: string // 地名（prefecture や address から取得）
+}
+
+export type TickerItemType = "discovery" | "spot_release" | "exploration"
+
+export interface TickerItem {
+  id: string
+  type: TickerItemType
+  createdAt: string
+  locationName: string
+  message: string
 }
 
 export interface FilterOptions {

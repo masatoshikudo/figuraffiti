@@ -8,7 +8,8 @@ import { SiteHeader } from "@/components/layout/site-header"
 import { AuthDialog } from "@/components/auth/auth-dialog"
 import { useAuth } from "@/contexts/auth-context"
 import { useSpots } from "@/hooks/use-spots"
-import { useDiscoveries } from "@/hooks/use-discoveries"
+import { useTicker } from "@/hooks/use-ticker"
+import { useToast } from "@/hooks/use-toast"
 import type { Spot } from "@/types/spot"
 import { SPOT_STATUS } from "@/lib/constants"
 import mapboxgl from "mapbox-gl"
@@ -16,10 +17,12 @@ import mapboxgl from "mapbox-gl"
 export function DiscoverMappingPage() {
   const { user } = useAuth()
   const { spots: allSpots } = useSpots()
-  const { discoveries, isLoading: discoveriesLoading } = useDiscoveries()
+  const { items, isLoading: tickerLoading, startExploration } = useTicker()
+  const { toast } = useToast()
 
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [isStartingExploration, setIsStartingExploration] = useState(false)
   const mapRef = useRef<mapboxgl.Map | null>(null)
 
   const approvedSpots = allSpots.filter(
@@ -38,23 +41,40 @@ export function DiscoverMappingPage() {
       setShowAuthDialog(true)
       return
     }
-    if (!selectedSpot) return
 
-    const spotNumber = selectedSpot.spotNumber
-    const spotId = selectedSpot.id
-    const params = new URLSearchParams()
+    window.location.href = "/discover/nfc"
+  }, [user])
 
-    if (spotNumber != null) {
-      params.set("spotNumber", String(spotNumber))
-    } else {
-      params.set("spotId", spotId)
+  const handleStartExploration = useCallback(async () => {
+    if (!user) {
+      setShowAuthDialog(true)
+      return
     }
 
-    window.location.href = `/discover/nfc?${params.toString()}`
-  }, [user, selectedSpot])
+    if (!selectedSpot || isStartingExploration) return
+
+    setIsStartingExploration(true)
+    const { success, error } = await startExploration(selectedSpot.id)
+    setIsStartingExploration(false)
+
+    if (success) {
+      toast({
+        title: "探索を開始しました",
+        description: "30分間、ティッカーにエリア名のみ表示されます。",
+      })
+      return
+    }
+
+    toast({
+      title: "探索開始に失敗しました",
+      description: error,
+      variant: "destructive",
+    })
+  }, [isStartingExploration, selectedSpot, startExploration, toast, user])
 
   const handleCloseSpotDetail = useCallback(() => {
     setSelectedSpot(null)
+    setIsStartingExploration(false)
   }, [])
 
   return (
@@ -81,9 +101,11 @@ export function DiscoverMappingPage() {
           <div className="pointer-events-auto max-h-[50vh] overflow-y-auto">
             <AhhHumSpotDetail
               spot={selectedSpot}
+              onStartExploration={handleStartExploration}
               onRecordDiscovery={handleRecordDiscovery}
               onClose={handleCloseSpotDetail}
               isAuthenticated={!!user}
+              isStartingExploration={isStartingExploration}
             />
           </div>
         </div>
@@ -91,8 +113,8 @@ export function DiscoverMappingPage() {
 
       <div className="absolute bottom-0 left-0 right-0 z-30 pb-[env(safe-area-inset-bottom)]">
         <DiscoveryTicker
-          discoveries={discoveries}
-          isLoading={discoveriesLoading}
+          items={items}
+          isLoading={tickerLoading}
         />
       </div>
     </div>

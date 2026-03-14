@@ -4,6 +4,7 @@ import { HowItWorks } from "@/components/layout/how-it-works"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { getSpacingClasses, getTypography, combineTokens } from "@/lib/design/design-tokens"
+import { Map } from "lucide-react"
 
 export default function HowItWorksPage() {
   return (
@@ -18,7 +19,10 @@ export default function HowItWorksPage() {
             </p>
             <div className={combineTokens("flex justify-center gap-4", getSpacingClasses({ gap: "02" }))}>
               <Button size="lg" className="rounded-full px-8" asChild>
-                <Link href="/discover/mapping">マップで探し始める</Link>
+                <Link href="/discover/mapping">
+                  <Map className="h-4 w-4" />
+                  マップで手がかりを見る
+                </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
                 <Link href="/guidelines">安全に楽しむポイント</Link>

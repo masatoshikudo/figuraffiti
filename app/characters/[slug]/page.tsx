@@ -72,11 +72,11 @@ export default async function CharacterPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                現地で NFC / QR を読み取ると、発見記録が更新されます。
+                現地で AhhHum の NFCタグを読み取ると、発見記録が更新されます。
               </p>
               <Button asChild className="w-full">
-                <Link href={`/discover/nfc?spotId=${encodeURIComponent(character.spotId)}`}>
-                  発見を記録する
+                <Link href="/discover/nfc">
+                  NFCでの記録方法を見る
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full">

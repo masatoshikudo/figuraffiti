@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { MapPin, Map, Menu } from "lucide-react"
 import { getSpacingClasses, getTypography, combineTokens } from "@/lib/design/design-tokens"
@@ -20,7 +21,9 @@ type SiteHeaderVariant = "page" | "overlay"
 
 export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }) {
   const isOverlay = variant === "overlay"
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const showMapCta = pathname !== "/discover/mapping"
   const overlaySurfaceClass = isOverlay
     ? "border-border/90 bg-background/90 backdrop-blur-xl"
     : "border-border/70 bg-background/45 backdrop-blur-sm"
@@ -99,12 +102,14 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
                   地図のヒントを頼りに歩いて見つけ、現地で発見を記録できます。
                 </p>
 
-                <Button size="sm" className="w-full justify-start rounded-full font-bold" asChild>
-                  <Link href="/discover/mapping" onClick={() => setMobileMenuOpen(false)}>
-                    <Map className="mr-2 h-4 w-4" />
-                    マップで探し始める
-                  </Link>
-                </Button>
+                {showMapCta ? (
+                  <Button size="sm" className="w-full justify-start rounded-full font-bold" asChild>
+                    <Link href="/discover/mapping" onClick={() => setMobileMenuOpen(false)}>
+                      <Map className="mr-2 h-4 w-4" />
+                      マップで手がかりを見る
+                    </Link>
+                  </Button>
+                ) : null}
 
                 <Separator />
 
@@ -192,12 +197,14 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
 
           <div className="flex items-center gap-3">
             <UserMenu />
-            <Button size="sm" className="rounded-full font-bold" asChild>
-              <Link href="/discover/mapping">
-                <Map className="mr-2 h-4 w-4" />
-                マップで探し始める
-              </Link>
-            </Button>
+            {showMapCta ? (
+              <Button size="sm" className="rounded-full font-bold" asChild>
+                <Link href="/discover/mapping">
+                  <Map className="mr-2 h-4 w-4" />
+                  マップで手がかりを見る
+                </Link>
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

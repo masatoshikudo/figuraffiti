@@ -45,8 +45,8 @@ export function SettingsTab({
       setDisplayName(nextDisplayName)
       onDisplayNameSaved?.(nextDisplayName)
       toast({
-        title: "表示名を保存しました",
-        description: "ティッカーや発見ログに反映されます。",
+        title: "アカウント名を保存しました",
+        description: "発見ログやプロフィールに反映されます。",
       })
     } catch (error) {
       toast({
@@ -65,26 +65,23 @@ export function SettingsTab({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            表示名
+            アカウント名
           </CardTitle>
-          <CardDescription>ティッカーや発見ログに表示される名前です</CardDescription>
+          <CardDescription>発見ログやプロフィールに表示される名前です</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-2">
-            <Label htmlFor="display-name">表示名</Label>
+            <Label htmlFor="display-name">アカウント名</Label>
             <Input
               id="display-name"
               maxLength={40}
-              placeholder="例: Explorer Shibuya"
+              placeholder="例: ahhhum_finder"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">
-              未設定の場合は `Explorer_xxxxx` が自動で使われます。
-            </p>
           </div>
           <Button onClick={handleSaveDisplayName} disabled={isSaving}>
-            {isSaving ? "保存中..." : "表示名を保存"}
+            {isSaving ? "保存中..." : "アカウント名を保存"}
           </Button>
         </CardContent>
       </Card>

@@ -4,12 +4,10 @@ import { Suspense, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { AuthDialog } from "@/components/auth/auth-dialog"
 import { useAuth } from "@/contexts/auth-context"
-import { useDiscoveries } from "@/hooks/use-discoveries"
 import { useToast } from "@/hooks/use-toast"
-import { ArrowLeft, LoaderCircle, QrCode, Radio } from "lucide-react"
+import { ArrowLeft, LoaderCircle, Radio, Sparkles } from "lucide-react"
 
 type NfcPageStatus =
   | "idle"
@@ -17,37 +15,25 @@ type NfcPageStatus =
   | "auth_required"
   | "recording"
   | "success"
-  | "duplicate"
   | "error"
 
 function DiscoverNfcPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading } = useAuth()
-  const { recordDiscovery, recordDiscoveryByNumber } = useDiscoveries()
   const { toast } = useToast()
 
   const token = searchParams.get("t")?.trim() ?? ""
-  const spotIdFromUrl = searchParams.get("spotId")?.trim() ?? ""
-  const spotNumberFromUrl = searchParams.get("spotNumber")?.trim() ?? ""
   const attemptedTokenRef = useRef<string | null>(null)
 
   const [status, setStatus] = useState<NfcPageStatus>("idle")
-  const [message, setMessage] = useState("NFCタグをかざすか、スポット番号を入力してください。")
+  const [message, setMessage] = useState("AhhHumを見つけたら、NFCタグにスマホをかざしてください。")
   const [authDialogOpen, setAuthDialogOpen] = useState(false)
-  const [manualInput, setManualInput] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
-    if (spotNumberFromUrl) {
-      setManualInput(spotNumberFromUrl)
-    }
-  }, [spotNumberFromUrl])
 
   useEffect(() => {
     if (!token) {
       setStatus("idle")
-      setMessage("NFCタグをかざすか、スポット番号を入力してください。")
+      setMessage("AhhHumを見つけたら、NFCタグにスマホをかざしてください。")
       return
     }
 
@@ -86,19 +72,12 @@ function DiscoverNfcPageContent() {
           throw new Error(data.error || "NFCによる発見記録に失敗しました")
         }
 
-        const duplicate = !!data.duplicate
-        setStatus(duplicate ? "duplicate" : "success")
-        setMessage(
-          duplicate
-            ? "このスポットは直近5分以内に記録済みです。"
-            : "発見を記録しました。マップへ戻ります..."
-        )
+        setStatus("success")
+        setMessage("発見を記録しました。マップへ戻ります...")
 
         toast({
-          title: duplicate ? "すでに記録済みです" : "発見を記録しました",
-          description: duplicate
-            ? "5分以内の重複記録は追加されません。"
-            : "Last Seen とティッカーが更新されます。",
+          title: "発見しました！",
+          description: "記録が完了し、ティッカーが更新されます。",
         })
 
         window.setTimeout(() => {
@@ -119,61 +98,6 @@ function DiscoverNfcPageContent() {
 
     void submit()
   }, [loading, router, toast, token, user])
-
-  const handleManualSubmit = async () => {
-    if (!user) {
-      setAuthDialogOpen(true)
-      toast({
-        title: "ログインが必要です",
-        description: "発見を記録するにはログインしてください。",
-        variant: "destructive",
-      })
-      return
-    }
-
-    if (spotIdFromUrl) {
-      setIsSubmitting(true)
-      const { success, error } = await recordDiscovery(spotIdFromUrl)
-      setIsSubmitting(false)
-
-      if (success) {
-        toast({ title: "発見を記録しました" })
-        router.push("/discover/mapping")
-      } else {
-        toast({ title: "記録に失敗しました", description: error, variant: "destructive" })
-      }
-      return
-    }
-
-    const trimmed = manualInput.trim()
-    if (!trimmed) {
-      toast({ title: "スポット番号を入力してください", variant: "destructive" })
-      return
-    }
-
-    const num = parseInt(trimmed, 10)
-    if (Number.isNaN(num) || num < 1) {
-      toast({
-        title: "有効なスポット番号を入力してください",
-        description: "#N の N を入力してください。",
-        variant: "destructive",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-    const { success, error } = await recordDiscoveryByNumber(num)
-    setIsSubmitting(false)
-
-    if (success) {
-      toast({ title: "発見を記録しました" })
-      router.push("/discover/mapping")
-    } else {
-      toast({ title: "記録に失敗しました", description: error, variant: "destructive" })
-    }
-  }
-
-  const hasPrefilledSpot = !!(spotIdFromUrl || spotNumberFromUrl)
   const isNfcMode = !!token
 
   return (
@@ -190,16 +114,22 @@ function DiscoverNfcPageContent() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
             {status === "recording" || status === "loading" ? (
               <LoaderCircle className="h-7 w-7 animate-spin" />
+            ) : status === "success" ? (
+              <Sparkles className="h-7 w-7" />
             ) : isNfcMode ? (
               <Radio className="h-7 w-7" />
             ) : (
-              <QrCode className="h-7 w-7" />
+              <Radio className="h-7 w-7" />
             )}
           </div>
 
           <div className="text-center space-y-2">
             <h2 className="text-lg font-semibold">
-              {isNfcMode ? "NFCタグを読み取りました" : "NFC / QR で発見を記録"}
+              {status === "success"
+                ? "発見しました！"
+                : isNfcMode
+                  ? "NFCタグを読み取りました"
+                  : "NFCで発見を記録"}
             </h2>
             <p className="text-sm text-muted-foreground">{message}</p>
           </div>
@@ -230,45 +160,12 @@ function DiscoverNfcPageContent() {
               ) : null}
             </div>
           ) : (
-            <div className="space-y-4">
-              {hasPrefilledSpot ? (
-                <div className="rounded-xl border border-border p-4 bg-muted/30">
-                  <p className="text-sm text-muted-foreground">
-                    このスポットで発見を記録します。
-                  </p>
-                  <Button
-                    className="mt-3 w-full"
-                    onClick={handleManualSubmit}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "記録中..." : "このスポットを記録する"}
-                  </Button>
-                </div>
-              ) : null}
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  スポット番号を手動入力（#N の N）
-                </label>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="例: 42"
-                  value={manualInput}
-                  onChange={(e) => setManualInput(e.target.value)}
-                />
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleManualSubmit}
-                  disabled={isSubmitting || (!manualInput.trim() && !spotIdFromUrl)}
-                >
-                  {isSubmitting ? "記録中..." : "記録する"}
-                </Button>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                ※ NFC対応端末では、タグを読み取ると自動で記録処理が始まります。
+            <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+              <p>
+                対応端末では、AhhHumにスマホをかざすと自動でこのページが開き、記録処理が始まります。
+              </p>
+              <p className="mt-2">
+                NFCタグは一度記録に成功すると無効化されるため、同じタグを再利用することはできません。
               </p>
             </div>
           )}

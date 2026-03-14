@@ -13,9 +13,12 @@ CREATE TABLE IF NOT EXISTS spots (
   prefecture TEXT,
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
+  display_lat DOUBLE PRECISION,
+  display_lng DOUBLE PRECISION,
   status TEXT DEFAULT 'approved' CHECK (status IN ('pending', 'approved', 'rejected')),
   last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   spot_number INTEGER,
+  visible_after TIMESTAMP WITH TIME ZONE,
   submitted_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   approved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   approved_at TIMESTAMP WITH TIME ZONE,
@@ -24,6 +27,10 @@ CREATE TABLE IF NOT EXISTS spots (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lat DOUBLE PRECISION;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lng DOUBLE PRECISION;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS visible_after TIMESTAMP WITH TIME ZONE;
 
 CREATE INDEX IF NOT EXISTS idx_spots_lat_lng ON spots(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_spots_status ON spots(status);
@@ -55,6 +62,23 @@ CREATE TABLE IF NOT EXISTS discovery_logs (
 
 CREATE INDEX IF NOT EXISTS idx_discovery_logs_spot_id ON discovery_logs(spot_id);
 CREATE INDEX IF NOT EXISTS idx_discovery_logs_discovered_at ON discovery_logs(discovered_at DESC);
+
+CREATE TABLE IF NOT EXISTS exploration_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  spot_id TEXT NOT NULL REFERENCES spots(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  ended_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_exploration_sessions_spot_id ON exploration_sessions(spot_id);
+CREATE INDEX IF NOT EXISTS idx_exploration_sessions_user_id ON exploration_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_exploration_sessions_started_at ON exploration_sessions(started_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_exploration_sessions_active_user
+  ON exploration_sessions(user_id)
+  WHERE ended_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS nfc_tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -118,6 +142,7 @@ CREATE INDEX IF NOT EXISTS idx_co_create_submissions_created_at ON co_create_sub
 -- ============================================
 ALTER TABLE spots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE discovery_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE exploration_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE nfc_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
@@ -170,6 +195,64 @@ CREATE POLICY "Read discovery logs" ON discovery_logs
 CREATE POLICY "Insert own discovery" ON discovery_logs
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- exploration_sessions
+DROP POLICY IF EXISTS "Read exploration sessions" ON exploration_sessions;
+DROP POLICY IF EXISTS "Users manage own exploration sessions" ON exploration_sessions;
+
+CREATE POLICY "Read exploration sessions" ON exploration_sessions
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users manage own exploration sessions" ON exploration_sessions
+  FOR ALL USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- nfc_tags
+DROP POLICY IF EXISTS "Admins full access nfc_tags" ON nfc_tags;
+
+CREATE POLICY "Admins full access nfc_tags" ON nfc_tags
+  FOR ALL USING (EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid()));
+
+CREATE OR REPLACE FUNCTION start_exploration_session(p_spot_id TEXT)
+RETURNS TABLE(success BOOLEAN, message TEXT, exploration_id UUID, expires_at TIMESTAMP WITH TIME ZONE)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
+  v_expires_at TIMESTAMP WITH TIME ZONE := NOW() + INTERVAL '30 minutes';
+  v_inserted_id UUID;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'AUTH_REQUIRED';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM spots
+    WHERE id = p_spot_id
+      AND status = 'approved'
+  ) THEN
+    RAISE EXCEPTION 'SPOT_NOT_FOUND';
+  END IF;
+
+  UPDATE exploration_sessions
+  SET ended_at = NOW()
+  WHERE user_id = v_user_id
+    AND ended_at IS NULL;
+
+  INSERT INTO exploration_sessions (spot_id, user_id, expires_at)
+  VALUES (p_spot_id, v_user_id, v_expires_at)
+  RETURNING id INTO v_inserted_id;
+
+  RETURN QUERY
+  SELECT TRUE, '探索を開始しました', v_inserted_id, v_expires_at;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION start_exploration_session(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION start_exploration_session(TEXT) TO authenticated;
+
 CREATE OR REPLACE FUNCTION record_discovery(p_spot_id TEXT)
 RETURNS TABLE(success BOOLEAN, duplicate BOOLEAN, message TEXT)
 LANGUAGE plpgsql
@@ -210,6 +293,11 @@ BEGIN
   INSERT INTO discovery_logs (spot_id, user_id)
   VALUES (p_spot_id, v_user_id);
 
+  UPDATE exploration_sessions
+  SET ended_at = NOW()
+  WHERE user_id = v_user_id
+    AND ended_at IS NULL;
+
   UPDATE spots
   SET last_seen = NOW()
   WHERE id = p_spot_id;
@@ -229,16 +317,26 @@ SET search_path = public
 AS $$
 DECLARE
   v_spot_id TEXT;
+  v_existing_spot_id TEXT;
 BEGIN
-  SELECT nfc_tags.spot_id
-  INTO v_spot_id
+  SELECT spot_id
+  INTO v_existing_spot_id
   FROM nfc_tags
   WHERE token = p_token
-    AND is_active = true
   LIMIT 1;
 
-  IF v_spot_id IS NULL THEN
+  IF v_existing_spot_id IS NULL THEN
     RAISE EXCEPTION 'NFC_TAG_NOT_FOUND';
+  END IF;
+
+  UPDATE nfc_tags
+  SET is_active = false
+  WHERE token = p_token
+    AND is_active = true
+  RETURNING spot_id INTO v_spot_id;
+
+  IF v_spot_id IS NULL THEN
+    RAISE EXCEPTION 'NFC_TAG_ALREADY_USED';
   END IF;
 
   RETURN QUERY

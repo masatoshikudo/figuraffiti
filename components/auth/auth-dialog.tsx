@@ -31,6 +31,7 @@ const loginSchema = z.object({
 })
 
 const signUpSchema = z.object({
+  accountName: z.string().trim().min(1, 'アカウント名を入力してください').max(40, 'アカウント名は40文字以内で入力してください'),
   email: z.string().email('有効なメールアドレスを入力してください'),
   password: z.string().min(6, 'パスワードは6文字以上である必要があります'),
   confirmPassword: z.string().min(6, 'パスワードは6文字以上である必要があります'),
@@ -66,6 +67,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'login', gateMessa
   const signUpForm = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      accountName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -91,7 +93,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'login', gateMessa
   }
 
   const onSignUpSubmit = async (values: SignUpFormValues) => {
-    const { error, data } = await signUp(values.email, values.password)
+    const { error, data } = await signUp(values.email, values.password, values.accountName)
     if (error) {
       toast({
         title: 'サインアップに失敗しました',
@@ -169,6 +171,19 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'login', gateMessa
           <TabsContent value="signup" className="space-y-4">
             <Form {...signUpForm}>
               <form onSubmit={signUpForm.handleSubmit(onSignUpSubmit)} className="space-y-4">
+                <FormField
+                  control={signUpForm.control}
+                  name="accountName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>アカウント名</FormLabel>
+                      <FormControl>
+                        <Input placeholder="例: ahhhum_finder" maxLength={40} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={signUpForm.control}
                   name="email"

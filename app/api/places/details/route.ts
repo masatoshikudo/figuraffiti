@@ -4,7 +4,9 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const placeId = searchParams.get("place_id")
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
+    const apiKey =
+      process.env.GOOGLE_PLACES_API_KEY ||
+      process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
 
     if (!placeId) {
       return NextResponse.json({ error: "place_id parameter is required" }, { status: 400 })
@@ -12,7 +14,10 @@ export async function GET(request: NextRequest) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Google Places API key is not configured" },
+        {
+          error:
+            "Google Places API key is not configured. Set GOOGLE_PLACES_API_KEY on the server or NEXT_PUBLIC_GOOGLE_PLACES_API_KEY as a fallback.",
+        },
         { status: 500 }
       )
     }
@@ -40,7 +45,7 @@ export async function GET(request: NextRequest) {
       // HTTPリファラー制限が設定されている場合のエラーメッセージを改善
       let errorMessage = data.error_message || `Google Places API error: ${data.status}`
       if (data.error_message && data.error_message.includes('referer restrictions')) {
-        errorMessage = 'APIキーにHTTPリファラー制限が設定されています。Google Cloud Consoleで「アプリケーションの制限」を「なし」に変更してください。'
+        errorMessage = 'APIキーにHTTPリファラー制限が設定されています。ローカル開発ではサーバー専用の GOOGLE_PLACES_API_KEY を使うか、Google Cloud Consoleで制限を見直してください。'
       }
       
       return NextResponse.json(

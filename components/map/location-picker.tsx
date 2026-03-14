@@ -31,7 +31,6 @@ export function LocationPicker({ onLocationChange, initialLat, initialLng }: Loc
   const [isDragging, setIsDragging] = useState(false)
   const [searchError, setSearchError] = useState<string>("")
   const [searchResults, setSearchResults] = useState<GooglePlacePrediction[]>([])
-  const [googleApiKey, setGoogleApiKey] = useState<string | null>(null)
   const isDraggingRef = useRef(false) // ドラッグ中かどうかを追跡
   const isZoomingRef = useRef(false) // ズーム中かどうかを追跡
   const initialCenterSetRef = useRef(false) // 初期位置が設定されたかどうかを追跡
@@ -48,14 +47,6 @@ export function LocationPicker({ onLocationChange, initialLat, initialLng }: Loc
     if (typeof window === 'undefined') return
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
     setHasToken(!!token)
-    
-    // Google Places APIキーのチェック
-    const googleKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
-    setGoogleApiKey(googleKey || null)
-    
-    if (!googleKey) {
-      console.warn('NEXT_PUBLIC_GOOGLE_PLACES_API_KEY is not set. Google Places search will not work.')
-    }
   }, [])
 
 

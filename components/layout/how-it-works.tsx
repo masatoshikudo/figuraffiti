@@ -1,4 +1,4 @@
-import { CheckCircle2, MapPin, QrCode } from "lucide-react"
+import { CheckCircle2, MapPin, Radio } from "lucide-react"
 import {
   getSpacingClasses,
   getTypography,
@@ -95,7 +95,7 @@ export function HowItWorks() {
                 getSpacingClasses({ mb: "04" })
               )}
             >
-              <QrCode className="h-6 w-6" />
+              <Radio className="h-6 w-6" />
             </div>
             <h3
               className={combineTokens(
@@ -106,7 +106,7 @@ export function HowItWorks() {
               ② 現地で記録する
             </h3>
             <ul className={combineTokens("space-y-3 leading-7", getTypography({ size: "sm" }), "text-muted-foreground")}>
-              <li>見つけたら NFC / QR を読み取り、「タッチ」してその場で発見記録を残します。</li>
+              <li>見つけたら NFCタグを読み取り、「タッチ」してその場で発見記録を残します。</li>
               <li>記録が反映されると Last Seen やティッカーにも変化が出て、探索の手応えが残ります。</li>
               <li>今後は発見順やバッジなど、見つけた人だけの演出も順次追加予定です。</li>
             </ul>

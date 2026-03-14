@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSpacingClasses, getTypography, combineTokens } from "@/lib/design/design-tokens"
 import Link from "next/link"
-import { Compass, LifeBuoy, ShieldAlert } from "lucide-react"
+import { Compass, LifeBuoy, Map, ShieldAlert } from "lucide-react"
 
 export default function GuidelinesPage() {
   return (
@@ -72,7 +72,7 @@ export default function GuidelinesPage() {
               <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
                 <li>「ここで見つけた」という発見の証跡を残す</li>
                 <li>Last Seen やティッカーに世界の動きを反映する</li>
-                <li>QR/NFC を通じて発見とデジタル体験を接続する</li>
+                <li>NFCタグを通じて発見とデジタル体験を接続する</li>
               </ul>
             </CardContent>
           </Card>
@@ -81,14 +81,14 @@ export default function GuidelinesPage() {
           <Card className="rounded-[2rem] border-border/70 bg-card/70">
             <CardHeader>
               <CardTitle>記録の方法</CardTitle>
-              <CardDescription>マップで探し、現地で NFC / QR を使って記録します</CardDescription>
+              <CardDescription>マップで探し、現地で NFC を使って記録します</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="leading-7 text-muted-foreground">
                 詳しくは<Link href="/how-it-works" className="text-primary hover:underline">探し方</Link>ページをご覧ください。
               </p>
               <p className="text-sm leading-7 text-muted-foreground">
-                曖昧なサークルを手がかりに現地まで行き、スポット番号入力または NFC / QR 読み取りで発見を記録します。
+                曖昧なサークルを手がかりに現地まで行き、見つけた AhhHum の NFCタグを読み取って発見を記録します。
               </p>
             </CardContent>
           </Card>
@@ -105,7 +105,7 @@ export default function GuidelinesPage() {
                   <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground">
                     <li>実際にその場所で見つけた痕跡だけを記録すること</li>
                     <li>私有地・危険な場所・法令違反となる行為を避けること</li>
-                    <li>スポット番号や記録内容を正確に扱うこと</li>
+                    <li>NFCタグの記録結果や発見内容を正確に扱うこと</li>
                   </ul>
                 </div>
                 <div className="rounded-3xl border border-destructive/15 bg-destructive/5 p-5">
@@ -139,7 +139,7 @@ export default function GuidelinesPage() {
                 <div className="flex items-start gap-2">
                   <span className="font-semibold">記録:</span>
                   <span className="text-sm text-muted-foreground">
-                    NFC / QR またはスポット番号入力で発見を記録します。
+                    現地で見つけた AhhHum の NFCタグを読み取って発見を記録します。
                   </span>
                 </div>
               </div>
@@ -176,8 +176,9 @@ export default function GuidelinesPage() {
           <section className="rounded-[2rem] border border-border/70 bg-card/60 p-6 text-center sm:p-8">
             <p className="text-lg font-medium">準備ができたら、まずはマップを開いて近くの気配から探してみてください。</p>
             <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/discover/mapping" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-                マップで探し始める
+              <Link href="/discover/mapping" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+                <Map className="h-4 w-4" />
+                マップで手がかりを見る
               </Link>
               <Link href="/how-it-works" className="rounded-full border border-border/80 bg-background/50 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card">
                 発見記録の流れを見る

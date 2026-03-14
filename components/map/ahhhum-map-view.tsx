@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 import type { Spot } from "@/types/spot"
 import { createCirclePolygon } from "@/lib/mapbox/cluster-range-utils"
+import { getSpotCircleCenter, isSpotVisible } from "@/lib/spot/circle-display-utils"
 import { getCircleColor } from "@/lib/spot/last-seen-utils"
 import { MAPBOX_CONFIG, AHHHUM_CONFIG } from "@/lib/constants"
 import { SPOT_STATUS } from "@/lib/constants"
@@ -24,11 +25,13 @@ interface AhhHumMapViewProps {
 }
 
 const SOURCE_ID = "ahhhum-spots-circles"
+const POINT_SOURCE_ID = "ahhhum-spots-points"
 const FILL_LAYER_ID = "ahhhum-spots-fill"
 const OUTLINE_LAYER_ID = "ahhhum-spots-outline"
+const PIN_LAYER_ID = "ahhhum-spots-pin"
 
 /**
- * AhhHum Phase1: 曖昧なサークル（50m）のみ表示するマップ
+ * AhhHum Phase1: 曖昧なサークル（直径300m）のみ表示するマップ
  */
 export function AhhHumMapView({
   spots,
@@ -44,7 +47,7 @@ export function AhhHumMapView({
   const [mapError, setMapError] = useState<string | null>(null)
 
   const approvedSpots = spots.filter(
-    (s) => !s.status || s.status === SPOT_STATUS.APPROVED
+    (s) => (!s.status || s.status === SPOT_STATUS.APPROVED) && isSpotVisible(s)
   )
 
   useEffect(() => {
@@ -59,8 +62,9 @@ export function AhhHumMapView({
   const getGeoJSONData = useCallback((): GeoJSON.FeatureCollection => {
     const features: GeoJSON.Feature<GeoJSON.Polygon>[] = approvedSpots.map(
       (spot) => {
+        const center = getSpotCircleCenter(spot)
         const polygon = createCirclePolygon(
-          { lat: spot.lat, lng: spot.lng },
+          center,
           AHHHUM_CONFIG.CIRCLE_RADIUS_M
         )
         const color = getCircleColor(spot.lastSeen)
@@ -74,6 +78,27 @@ export function AhhHumMapView({
         }
       }
     )
+    return { type: "FeatureCollection", features }
+  }, [approvedSpots])
+
+  const getPointGeoJSONData = useCallback((): GeoJSON.FeatureCollection => {
+    const features: GeoJSON.Feature<GeoJSON.Point>[] = approvedSpots.map((spot) => {
+      const center = getSpotCircleCenter(spot)
+      const color = getCircleColor(spot.lastSeen)
+
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [center.lng, center.lat],
+        },
+        properties: {
+          spotId: spot.id,
+          color,
+        },
+      }
+    })
+
     return { type: "FeatureCollection", features }
   }, [approvedSpots])
 
@@ -117,11 +142,18 @@ export function AhhHumMapView({
           data: getGeoJSONData(),
         })
 
+        map.addSource(POINT_SOURCE_ID, {
+          type: "geojson",
+          data: getPointGeoJSONData(),
+        })
+
         map.addLayer({
           id: FILL_LAYER_ID,
           type: "fill",
           source: SOURCE_ID,
+          minzoom: AHHHUM_CONFIG.CIRCLE_SWITCH_ZOOM,
           paint: {
+            "fill-antialias": false,
             "fill-color": ["get", "color"],
             "fill-opacity": 0.25,
           },
@@ -131,26 +163,69 @@ export function AhhHumMapView({
           id: OUTLINE_LAYER_ID,
           type: "line",
           source: SOURCE_ID,
+          minzoom: AHHHUM_CONFIG.CIRCLE_SWITCH_ZOOM,
           paint: {
             "line-color": ["get", "color"],
             "line-width": 2,
           },
         })
 
-        map.on("click", FILL_LAYER_ID, (e) => {
-          const feature = e.features?.[0]
-          if (!feature?.properties?.spotId) return
-          const spot = approvedSpotsRef.current.find(
-            (s) => s.id === feature.properties!.spotId
-          )
-          if (spot) onSpotClickRef.current(spot)
+        map.addLayer({
+          id: PIN_LAYER_ID,
+          type: "circle",
+          source: POINT_SOURCE_ID,
+          maxzoom: AHHHUM_CONFIG.CIRCLE_SWITCH_ZOOM,
+          paint: {
+            "circle-color": ["get", "color"],
+            "circle-radius": 7,
+            "circle-stroke-color": "#ffffff",
+            "circle-stroke-width": 2,
+          },
         })
 
-        map.on("mouseenter", FILL_LAYER_ID, () => {
-          map.getCanvas().style.cursor = "pointer"
-        })
-        map.on("mouseleave", FILL_LAYER_ID, () => {
-          map.getCanvas().style.cursor = ""
+        const getSpotFromEvent = (
+          e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapMouseEvent
+        ) => {
+          const feature = e.features?.[0]
+          if (!feature?.properties?.spotId) return null
+
+          return approvedSpotsRef.current.find(
+            (s) => s.id === feature.properties!.spotId
+          )
+        }
+
+        const handleCircleClick = (
+          e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapMouseEvent
+        ) => {
+          const spot = getSpotFromEvent(e)
+          if (spot) onSpotClickRef.current(spot)
+        }
+
+        const handlePinClick = (
+          e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapMouseEvent
+        ) => {
+          const spot = getSpotFromEvent(e)
+          if (!spot) return
+
+          const center = getSpotCircleCenter(spot)
+          map.flyTo({
+            center: [center.lng, center.lat],
+            zoom: Math.max(AHHHUM_CONFIG.PIN_CLICK_ZOOM, AHHHUM_CONFIG.CIRCLE_SWITCH_ZOOM),
+            duration: 1000,
+          })
+        }
+
+        map.on("click", FILL_LAYER_ID, handleCircleClick)
+        map.on("click", OUTLINE_LAYER_ID, handleCircleClick)
+        map.on("click", PIN_LAYER_ID, handlePinClick)
+
+        ;[FILL_LAYER_ID, OUTLINE_LAYER_ID, PIN_LAYER_ID].forEach((layerId) => {
+          map.on("mouseenter", layerId, () => {
+            map.getCanvas().style.cursor = "pointer"
+          })
+          map.on("mouseleave", layerId, () => {
+            map.getCanvas().style.cursor = ""
+          })
         })
       })
 
@@ -175,11 +250,16 @@ export function AhhHumMapView({
     const map = mapRefInternal.current
     if (!map || !map.loaded()) return
 
-    const source = map.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined
-    if (source) {
-      source.setData(getGeoJSONData())
+    const polygonSource = map.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined
+    if (polygonSource) {
+      polygonSource.setData(getGeoJSONData())
     }
-  }, [getGeoJSONData])
+
+    const pointSource = map.getSource(POINT_SOURCE_ID) as mapboxgl.GeoJSONSource | undefined
+    if (pointSource) {
+      pointSource.setData(getPointGeoJSONData())
+    }
+  }, [getGeoJSONData, getPointGeoJSONData])
 
   const handleLocate = useCallback(() => {
     const map = mapRefInternal.current
@@ -220,7 +300,7 @@ export function AhhHumMapView({
           </div>
         </div>
       )}
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute top-20 right-4">
         <Button
           variant="secondary"
           size="icon"

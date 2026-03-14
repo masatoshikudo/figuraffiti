@@ -51,8 +51,7 @@ export async function GET(request: NextRequest) {
 
     const result: DiscoveryLog[] = logs.map((log) => {
       const spot = spotMap.get(log.spot_id)
-      const displayName =
-        profileMap.get(log.user_id) || `Explorer_${log.user_id.slice(-6)}`
+      const displayName = profileMap.get(log.user_id) ?? undefined
       const locationName = spot?.prefecture || "Unknown"
 
       return {
@@ -78,105 +77,13 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/discoveries
- * 発見を記録（NFC/QR読み取り後のタギング）
- * Body: { spotId: string } または { spotNumber: number }
+ * MVPでは無効。発見記録は NFC トークン経由のみ。
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: ERROR_MESSAGES.AUTH_REQUIRED },
-        { status: 401 }
-      )
-    }
-
-    const body = await request.json()
-    const spotId = body.spotId as string | undefined
-    const spotNumber = body.spotNumber as number | undefined
-
-    if (!spotId && spotNumber === undefined) {
-      return NextResponse.json(
-        { error: "spotId または spotNumber が必要です" },
-        { status: 400 }
-      )
-    }
-
-    let resolvedSpotId: string
-    if (spotId) {
-      resolvedSpotId = spotId
-    } else {
-      // spotNumber からスポットを検索
-      const { data: spot, error: spotError } = await supabase
-        .from("spots")
-        .select("id")
-        .eq("spot_number", spotNumber)
-        .eq("status", "approved")
-        .single()
-
-      if (spotError || !spot) {
-        return NextResponse.json(
-          { error: "該当するスポットが見つかりません" },
-          { status: 404 }
-        )
-      }
-      resolvedSpotId = spot.id
-    }
-
-    // スポットの存在確認
-    const { data: spot, error: spotError } = await supabase
-      .from("spots")
-      .select("id, status")
-      .eq("id", resolvedSpotId)
-      .single()
-
-    if (spotError || !spot || spot.status !== "approved") {
-      return NextResponse.json(
-        { error: "該当するスポットが見つかりません" },
-        { status: 404 }
-      )
-    }
-
-    // discovery_logs 追加 + last_seen 更新を DB 関数で一括実行
-    // SECURITY DEFINER により、必要最小限の権限で RLS を越えて更新する
-    const { data: result, error: rpcError } = await supabase
-      .rpc("record_discovery", { p_spot_id: resolvedSpotId })
-      .single()
-
-    if (rpcError) {
-      console.error("[POST /api/discoveries] RPC error:", rpcError)
-
-      if (rpcError.message.includes("AUTH_REQUIRED")) {
-        return NextResponse.json(
-          { error: ERROR_MESSAGES.AUTH_REQUIRED },
-          { status: 401 }
-        )
-      }
-
-      if (rpcError.message.includes("SPOT_NOT_FOUND")) {
-        return NextResponse.json(
-          { error: "該当するスポットが見つかりません" },
-          { status: 404 }
-        )
-      }
-
-      return NextResponse.json(
-        { error: "発見記録の更新に失敗しました" },
-        { status: 500 }
-      )
-    }
-
     return NextResponse.json({
-      success: result?.success ?? true,
-      duplicate: result?.duplicate ?? false,
-      spotId: resolvedSpotId,
-      message: result?.message ?? "発見を記録しました",
-    })
+      error: "発見記録はNFCタグの読み取りからのみ実行できます",
+    }, { status: 410 })
   } catch (error) {
     console.error("[POST /api/discoveries] Unexpected error:", error)
     return NextResponse.json(

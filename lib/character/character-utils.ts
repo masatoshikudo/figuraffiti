@@ -34,6 +34,6 @@ export function buildCharacterDiscoveries(logs: DiscoveryLog[]): CharacterDiscov
   return logs.map((log) => ({
     id: log.id,
     discoveredAt: log.discoveredAt,
-    userName: log.userName || `Explorer_${log.userId.slice(-6)}`,
+    userName: log.userName || "未設定",
   }))
 }

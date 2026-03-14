@@ -18,6 +18,8 @@ export function dbToSpot(dbSpot: DbSpot): Spot {
     prefecture: dbSpot.prefecture || undefined,
     lat: dbSpot.lat,
     lng: dbSpot.lng,
+    displayLat: dbSpot.display_lat ?? undefined,
+    displayLng: dbSpot.display_lng ?? undefined,
     media,
     createdAt: dbSpot.created_at,
     updatedAt: dbSpot.updated_at || undefined,
@@ -28,6 +30,7 @@ export function dbToSpot(dbSpot: DbSpot): Spot {
     rejectionReason: dbSpot.rejection_reason || undefined,
     lastSeen: dbSpot.last_seen ?? undefined,
     spotNumber: dbSpot.spot_number ?? undefined,
+    visibleAfter: dbSpot.visible_after ?? undefined,
   }
 
   spot.characterSlug = createCharacterSlug(spot)
@@ -44,6 +47,9 @@ export function spotToDb(spot: Partial<Spot>) {
     prefecture: spot.prefecture || null,
     lat: spot.lat,
     lng: spot.lng,
+    display_lat: spot.displayLat ?? null,
+    display_lng: spot.displayLng ?? null,
+    visible_after: spot.visibleAfter ?? null,
     ...(spot.status && { status: spot.status }),
     ...(spot.submittedBy && { submitted_by: spot.submittedBy }),
     ...(spot.approvedBy && { approved_by: spot.approvedBy }),

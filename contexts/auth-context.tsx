@@ -8,7 +8,7 @@ type AuthContextType = {
   user: User | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, accountName: string) => Promise<{ error: Error | null; data?: unknown }>
   signOut: () => Promise<void>
 }
 
@@ -73,11 +73,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, accountName: string) => {
     if (!supabase) {
       return { error: new Error('Supabase is not configured'), data: null }
     }
     try {
+      const trimmedAccountName = accountName.trim()
+
       // メール確認後のリダイレクト先を設定
       const redirectTo = typeof window !== 'undefined' 
         ? `${window.location.origin}/auth/callback`
@@ -88,8 +90,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: {
           emailRedirectTo: redirectTo,
+          data: {
+            account_name: trimmedAccountName,
+            display_name: trimmedAccountName,
+          },
         },
       })
+
+      if (!error && data?.user?.id && data.session) {
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .upsert(
+            {
+              user_id: data.user.id,
+              display_name: trimmedAccountName,
+            },
+            {
+              onConflict: 'user_id',
+            }
+          )
+
+        if (profileError) {
+          return { error: profileError as Error, data }
+        }
+      }
       
       // デバッグ用: レスポンスをログに出力
       if (process.env.NODE_ENV === 'development') {

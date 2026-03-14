@@ -3,8 +3,9 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
+import { HomeDiscoveryTickerSection } from "@/components/discovery/home-discovery-ticker-section"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Map } from "lucide-react"
 import { createClient } from "@/lib/supabase/supabase-server"
 
 const DEFAULT_PREFECTURE = "東京都"
@@ -112,15 +113,15 @@ const PREFECTURE_BY_SLUG: Record<string, string> = {
 const ahhHumPillars = [
   {
     title: "街にひそんでいる",
-    body: "AhhHum は画面の中だけじゃない。ストリートの余白にひそみ、街のどこかでキミを待っている。",
+    body: "デジタルの中だけじゃない。ストリートの余白にひそみ、どこかでキミを待っている。",
   },
   {
     title: "見つけたら「タッチ」できる",
-    body: "フィギュアには NFC タグと QR コードがついている。見つけたキミだけが「タッチ」して、発見を記録できる。",
+    body: "Ahh と Hum には NFC タグと QR コードがついている。「タッチ」して、記録できる。",
   },
   {
     title: "いつまでそこにいるかわからない",
-    body: "AhhHum は、ずっと同じ場所にいるとは限らない。だからこそ、見つけた瞬間がキミだけの発見になる。",
+    body: "ずっと同じ場所にいるとは限らない。出会えた瞬間そのものが特別になる。",
   },
 ] as const
 
@@ -128,24 +129,24 @@ const searchSteps = [
   {
     step: "01",
     title: "マップで手がかりを見る",
-    body: "正確なピンではなく、サークルやヒントから場所の気配をつかむ。どこにいるかを想像するところから始まる。",
+    body: "まずはマップに表示されるサークルを見て、AhhHum がいそうなエリアを確認する。",
+    imageSrc: "/step1.png",
+    imageAlt: "マップ上の手がかりから AhhHum の気配を探すイラスト",
   },
   {
     step: "02",
-    title: "街を歩いて探す",
-    body: "近くまで来たら、自分の目で周囲を観察する。普段は見過ごす街の余白が、探索の舞台に変わる。",
+    title: "「このスポットを探す」ボタンを押す",
+    body: "気になるスポットを見つけたら詳細を開いて、探索を始めるために「このスポットを探す」ボタンを押す。",
+    imageSrc: "/step2.png",
+    imageAlt: "街を歩きながら AhhHum を探しているイラスト",
   },
   {
     step: "03",
-    title: "見つけたら次へ進む",
-    body: "AhhHum を見つけたら、その場で「タッチ」へ。発見を記録することで、出会った事実が自分のものになる。",
+    title: "サークル内をくまなく探す",
+    body: "サークルのエリア内を歩きながら周囲を見て、自分の目で AhhHum を探す。",
+    imageSrc: "/step3.png?v=20260313",
+    imageAlt: "AhhHum を探すためのヒントをスマホで確認しているイラスト",
   },
-] as const
-
-const touchSteps = [
-  "スポットの近くまで行く",
-  "QRを読み取る / NFCでタッチする",
-  "発見の証を記録する",
 ] as const
 
 function normalizePrefecture(value: string | null | undefined) {
@@ -265,15 +266,13 @@ export default async function Home() {
                     がんばって、楽しんで！
                   </p>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div>
                   <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
                     <Link href="/discover/mapping">
-                      マップで探索を始める
+                      <Map className="h-4 w-4" />
+                      マップで手がかりを見る
                       <ArrowRight className="h-4 w-4" />
                     </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="h-12 rounded-full border-border/80 bg-background/40 px-8 text-base" asChild>
-                    <Link href="/education">遊び方を見る</Link>
                   </Button>
                 </div>
                 <div className="space-y-2 border-t border-border/70 pt-6">
@@ -319,6 +318,8 @@ export default async function Home() {
           </div>
         </section>
 
+        <HomeDiscoveryTickerSection />
+
         <section className="relative overflow-hidden border-y border-border/70 bg-card/35">
           <div className="pointer-events-none absolute inset-y-0 left-0 hidden lg:flex items-center">
             <Image
@@ -327,7 +328,12 @@ export default async function Home() {
               aria-hidden="true"
               width={540}
               height={1080}
-              className="-translate-x-[46%] h-auto w-[240px] xl:w-[300px]"
+              className="figure-pan-in h-auto w-[240px] xl:w-[300px]"
+              style={{
+                ["--pan-x-from" as string]: "-62%",
+                ["--pan-x-to" as string]: "-46%",
+                ["--pan-scale-from" as string]: "1.12",
+              }}
             />
           </div>
           <div className="pointer-events-none absolute inset-y-0 right-0 hidden lg:flex items-center">
@@ -337,11 +343,17 @@ export default async function Home() {
               aria-hidden="true"
               width={540}
               height={1080}
-              className="translate-x-[46%] h-auto w-[240px] xl:w-[300px]"
+              className="figure-pan-in h-auto w-[240px] xl:w-[300px]"
+              style={{
+                ["--pan-x-from" as string]: "62%",
+                ["--pan-x-to" as string]: "46%",
+                ["--pan-scale-from" as string]: "1.12",
+                ["--pan-delay" as string]: "0.12s",
+              }}
             />
           </div>
-          <div className="container relative z-10 mx-auto max-w-5xl px-4 py-14 sm:py-16">
-            <div className="mx-auto max-w-3xl space-y-8">
+          <div className="container relative z-10 mx-auto flex max-w-5xl flex-col justify-center px-4 py-14 sm:py-16 lg:min-h-[36rem]">
+            <div className="space-y-8">
               <div className="max-w-2xl space-y-4">
                 <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">What Is AhhHum</p>
                 <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">AhhHumって、なに？</h2>
@@ -353,7 +365,12 @@ export default async function Home() {
                       aria-hidden="true"
                       width={120}
                       height={240}
-                      className="h-full w-auto max-w-none -translate-x-[44%]"
+                      className="figure-pan-in h-full w-auto max-w-none"
+                      style={{
+                        ["--pan-x-from" as string]: "-58%",
+                        ["--pan-x-to" as string]: "-44%",
+                        ["--pan-scale-from" as string]: "1.08",
+                      }}
                     />
                   </div>
                   <div className="pointer-events-none absolute bottom-0 -right-4 overflow-hidden h-48 w-[7.5rem] sm:-right-6 sm:h-52 sm:w-36">
@@ -363,7 +380,13 @@ export default async function Home() {
                       aria-hidden="true"
                       width={120}
                       height={240}
-                      className="ml-auto h-full w-auto max-w-none translate-x-[44%]"
+                      className="figure-pan-in ml-auto h-full w-auto max-w-none"
+                      style={{
+                        ["--pan-x-from" as string]: "58%",
+                        ["--pan-x-to" as string]: "44%",
+                        ["--pan-scale-from" as string]: "1.08",
+                        ["--pan-delay" as string]: "0.08s",
+                      }}
                     />
                   </div>
                   <p className="relative z-10 px-10 pt-8 text-sm leading-7 text-muted-foreground sm:px-14">
@@ -387,62 +410,58 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
+        <section className="container mx-auto flex max-w-5xl flex-col justify-center px-4 py-14 sm:py-16 lg:min-h-[36rem]">
           <div className="max-w-2xl space-y-4">
             <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Find AhhHum</p>
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">どうやって探す？</h2>
-            <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-              まずはヒントを見て、次に街を歩いて、自分の目で探す。答えが最初から見えないからこそ、見つけた瞬間がうれしい。
-            </p>
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {searchSteps.map((item) => (
-              <div key={item.step} className="rounded-[2rem] border border-border/70 bg-card/60 p-6">
-                <p className="text-sm font-medium tracking-[0.24em] text-brand-strong">{item.step}</p>
-                <h3 className="mt-4 text-xl font-semibold tracking-tight">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.body}</p>
+          <div className="mt-10 grid gap-8 md:grid-cols-3 md:gap-6">
+            {searchSteps.map((item, index) => (
+              <div key={item.step} className="relative flex h-full flex-col">
+                <div className="pb-2">
+                  <div className="relative overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/50">
+                    <div className="absolute left-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-brand/30 bg-background/95 text-sm font-semibold tracking-[0.24em] text-brand-strong shadow-sm backdrop-blur-sm">
+                      {item.step}
+                    </div>
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.imageAlt}
+                      width={1024}
+                      height={768}
+                      className="h-auto w-full object-cover"
+                    />
+                  </div>
+                  <div className="mt-5 border-l border-border/70 pl-6">
+                    <h3 className="text-xl font-semibold tracking-tight">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.body}</p>
+                  </div>
+                </div>
+                {index < searchSteps.length - 1 ? (
+                  <div className="pointer-events-none mt-5 flex justify-center md:absolute md:right-[-1.35rem] md:top-[2.375rem] md:z-20 md:mt-0 md:-translate-y-1/2">
+                    <ArrowRight className="h-4 w-4 rotate-90 text-muted-foreground/80 md:rotate-0" />
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
         </section>
 
         <section className="border-t border-border/70 bg-card/35">
-          <div className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-center">
-              <div className="space-y-4">
-                <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Touch AhhHum</p>
-                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">見つけたら「タッチ」しよう</h2>
-                <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                  AhhHum を見つけたら、その場で記録へ。フィギュアの QR を読み取るか、対応端末なら NFC でタッチすると、現地で見つけた証が残る。
-                </p>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
-                    <Link href="/discover/mapping">
-                      マップで探索を始める
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base" asChild>
-                    <Link href="/education">遊び方を見る</Link>
-                  </Button>
-                </div>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  スポットや端末に応じて QR / NFC のどちらかで記録できる。見つけた人だけが、発見を自分の履歴として残せる。
-                </p>
-              </div>
-              <div className="rounded-[2rem] border border-border/70 bg-background/80 p-6 sm:p-7">
-                <ol className="space-y-4">
-                  {touchSteps.map((step, index) => (
-                    <li key={step} className="flex gap-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-sm font-semibold text-brand-strong">
-                        {index + 1}
-                      </div>
-                      <div className="pt-1">
-                        <p className="text-base font-medium tracking-tight">{step}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+          <div className="container mx-auto flex max-w-5xl flex-col justify-center px-4 py-14 sm:py-16 lg:min-h-[30rem]">
+            <div className="max-w-2xl space-y-4">
+              <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Touch AhhHum</p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">見つけたら「タッチ」しよう</h2>
+              <p className="text-base leading-7 text-muted-foreground sm:text-lg">
+                AhhHum を見つけたら、その場で発見を記録できます。フィギュアの QR コードを読み取るか、対応端末で NFC にタッチすると、現地で見つけた記録が履歴に保存されます。
+              </p>
+              <div>
+                <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
+                  <Link href="/discover/mapping">
+                    <Map className="h-4 w-4" />
+                    マップで手がかりを見る
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

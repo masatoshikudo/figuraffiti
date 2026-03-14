@@ -8,7 +8,8 @@
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_MAPBOX_TOKEN=your-mapbox-token
-NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your-google-places-api-key  # 任意
+GOOGLE_PLACES_API_KEY=your-google-places-api-key              # 推奨
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your-google-places-api-key  # 任意・後方互換
 ```
 
 ### Mapbox トークン

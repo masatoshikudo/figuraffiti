@@ -53,6 +53,13 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      if (rpcError.message.includes("NFC_TAG_ALREADY_USED")) {
+        return NextResponse.json(
+          { error: "このNFCタグはすでに使用済みです" },
+          { status: 409 }
+        )
+      }
+
       if (rpcError.message.includes("SPOT_NOT_FOUND")) {
         return NextResponse.json(
           { error: "紐づくスポットが見つかりません" },
@@ -68,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: result?.success ?? true,
-      duplicate: result?.duplicate ?? false,
       spotId: result?.spot_id ?? null,
       message: result?.message ?? "発見を記録しました",
     })

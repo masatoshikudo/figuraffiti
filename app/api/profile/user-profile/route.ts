@@ -57,14 +57,21 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const rawDisplayName = body.displayName
-    if (rawDisplayName != null && typeof rawDisplayName !== "string") {
+    if (typeof rawDisplayName !== "string") {
       return NextResponse.json(
         { error: "displayName must be a string" },
         { status: 400 }
       )
     }
 
-    const displayName = rawDisplayName?.trim() ? rawDisplayName.trim().slice(0, 40) : null
+    const displayName = rawDisplayName.trim().slice(0, 40)
+
+    if (!displayName) {
+      return NextResponse.json(
+        { error: "アカウント名は必須です" },
+        { status: 400 }
+      )
+    }
 
     const profile = await upsertUserProfile(user.id, displayName)
 

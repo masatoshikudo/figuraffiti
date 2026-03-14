@@ -71,7 +71,7 @@ async function fetchCharacterDiscoveries(
   return logs.map((log) => ({
     id: log.id,
     discoveredAt: log.discovered_at,
-    userName: profileMap.get(log.user_id) || `Explorer_${log.user_id.slice(-6)}`,
+    userName: profileMap.get(log.user_id) ?? "未設定",
   }))
 }
 

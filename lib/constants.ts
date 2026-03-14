@@ -57,6 +57,8 @@ export const API_CONFIG = {
   CO_CREATE_REJECT_ENDPOINT: "/api/co-create/reject",
   CO_CREATE_MY_SUBMISSIONS_ENDPOINT: "/api/co-create/my-submissions",
   DISCOVERIES_ENDPOINT: "/api/discoveries",
+  TICKER_ENDPOINT: "/api/ticker",
+  EXPLORATIONS_ENDPOINT: "/api/explorations",
   PLACES_AUTOCOMPLETE_ENDPOINT: "/api/places/autocomplete",
   PLACES_DETAILS_ENDPOINT: "/api/places/details",
   ADMIN_TRUSTED_USERS_ENDPOINT: "/api/admin/trusted-users",
@@ -297,8 +299,12 @@ export const SPOT_MARKER_STYLES = {
 
 // AhhHum Phase1: 曖昧サークル
 export const AHHHUM_CONFIG = {
-  CIRCLE_RADIUS_M: 50,
-  FRESHNESS_HOURS_HIGH: 24, // 24h以内 = 高鮮度（赤系）
+  CIRCLE_RADIUS_M: 150,
+  ADMIN_CIRCLE_DELAY_HOURS: 1,
+  CIRCLE_SWITCH_ZOOM: 13,
+  PIN_CLICK_ZOOM: 14,
+  EXPLORATION_DURATION_MINUTES: 30,
+  FRESHNESS_HOURS_HIGH: 48, // 48h以内 = 高鮮度（赤系）
   FRESHNESS_DAYS_MEDIUM: 7, // 7日以内 = 中鮮度（黄系）
   // 7日超 = 低鮮度（グレー系）
   CIRCLE_COLORS: {

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Compass, Mail, MapPin, ShieldCheck } from "lucide-react"
+import { Compass, Mail, Map, MapPin, ShieldCheck } from "lucide-react"
 import { getSpacingClasses, getTypography, combineTokens, getGridClasses } from "@/lib/design/design-tokens"
 import { EXTERNAL_URLS } from "@/lib/constants"
 
@@ -24,24 +24,20 @@ export function SiteFooter() {
               </div>
             </div>
             <h3 className={combineTokens("mb-6 tracking-tight text-balance", getTypography({ size: "3xl", weight: "bold" }))}>
-              気になる場所を、
+              AhhHumを見つけて、
               <br />
-              歩いて見つける。
+              「タッチ」しよう。
             </h3>
             <p className={combineTokens("mb-8 max-w-md leading-7 text-muted-foreground")}>
-              地図で気配を見つけて、現地で確かめて、発見を記録する。
+              マップでスポットの手がかりを確認し、現地で AhhHum を見つけたら発見を記録できます。
               <br />
-              AhhHum は、その流れをシンプルに楽しめる場所です。
+              QR コードの読み取り、または対応端末での NFC タッチに対応しています。
             </p>
             <div className={combineTokens("flex flex-wrap", getSpacingClasses({ gap: "02" }))}>
               <Button className="rounded-full px-6 font-bold" asChild>
                 <Link href="/discover/mapping">
-                  マップで探し始める
-                </Link>
-              </Button>
-              <Button variant="outline" className="rounded-full border-white/20 bg-white/6 px-6 text-white hover:bg-white/10" asChild>
-                <Link href="/education">
-                  遊び方を見る
+                  <Map className="h-4 w-4" />
+                  マップで手がかりを見る
                 </Link>
               </Button>
             </div>
@@ -99,7 +95,7 @@ export function SiteFooter() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="mt-0.5 h-4 w-4 text-brand" />
                   <p className={combineTokens(getTypography({ size: "sm" }), "leading-6 text-muted-foreground")}>
-                    私有地への立ち入りや危険行為を促さない、街歩き前提の探索体験です。
+                    公共の場所を歩いて探し、現地で見つけたときだけ QR / NFC で発見を記録する体験です。私有地への立ち入りや危険行為、捏造された記録は行わないでください。
                   </p>
                 </div>
               </div>
@@ -145,7 +141,7 @@ export function SiteFooter() {
           <div className={combineTokens("flex items-center", getSpacingClasses({ gap: "02" }))}>
             <Compass className="h-4 w-4 text-brand" />
             <p className={combineTokens("text-muted-foreground", getTypography({ size: "xs" }))}>
-              ヒントを見て歩き、現地で確かめるシンプルな導線に整えています。
+              公共の場所で探し、現地で見つけた発見だけを記録する遊びとして設計しています。
             </p>
           </div>
         </div>

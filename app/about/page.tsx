@@ -3,7 +3,7 @@ import Link from "next/link"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { Button } from "@/components/ui/button"
-import { Compass, MapPinned, ScanSearch, Shapes } from "lucide-react"
+import { Compass, Map, MapPinned, ScanSearch, Shapes } from "lucide-react"
 
 const pillars = [
   {
@@ -110,7 +110,10 @@ export default function AboutPage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
-                <Link href="/discover/mapping">マップで探し始める</Link>
+                <Link href="/discover/mapping">
+                  <Map className="h-4 w-4" />
+                  マップで手がかりを見る
+                </Link>
               </Button>
               <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base" asChild>
                 <Link href="/education">遊び方を見る</Link>

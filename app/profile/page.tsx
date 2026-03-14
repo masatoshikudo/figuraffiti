@@ -115,7 +115,8 @@ export default function ProfilePage() {
     .split("")
     .join("") || "U"
 
-  const effectiveDisplayName = displayName || `Explorer_${user.id.slice(-6)}`
+  const effectiveDisplayName =
+    displayName || user.user_metadata?.account_name || user.user_metadata?.display_name || "未設定"
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

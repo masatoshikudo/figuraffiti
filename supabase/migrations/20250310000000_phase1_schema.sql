@@ -8,9 +8,12 @@ CREATE TABLE IF NOT EXISTS spots (
   prefecture TEXT,
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
+  display_lat DOUBLE PRECISION,
+  display_lng DOUBLE PRECISION,
   status TEXT DEFAULT 'approved' CHECK (status IN ('pending', 'approved', 'rejected')),
   last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   spot_number INTEGER,
+  visible_after TIMESTAMP WITH TIME ZONE,
   submitted_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   approved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   approved_at TIMESTAMP WITH TIME ZONE,
@@ -19,6 +22,10 @@ CREATE TABLE IF NOT EXISTS spots (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lat DOUBLE PRECISION;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lng DOUBLE PRECISION;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS visible_after TIMESTAMP WITH TIME ZONE;
 
 CREATE INDEX IF NOT EXISTS idx_spots_lat_lng ON spots(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_spots_status ON spots(status);
@@ -115,6 +122,9 @@ DROP POLICY IF EXISTS "Allow public read discovery logs" ON discovery_logs;
 DROP POLICY IF EXISTS "Authenticated users can insert discovery logs" ON discovery_logs;
 CREATE POLICY "Read discovery logs" ON discovery_logs FOR SELECT USING (true);
 CREATE POLICY "Insert own discovery" ON discovery_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Admins full access nfc_tags" ON nfc_tags;
+CREATE POLICY "Admins full access nfc_tags" ON nfc_tags FOR ALL USING (EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid()));
 
 CREATE OR REPLACE FUNCTION record_discovery(p_spot_id TEXT)
 RETURNS TABLE(success BOOLEAN, duplicate BOOLEAN, message TEXT)

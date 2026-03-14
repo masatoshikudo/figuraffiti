@@ -8,6 +8,11 @@ const nextConfig = {
   images: {
     // 画像最適化を有効化（WebP形式への自動変換、レスポンシブ画像対応）
     formats: ['image/avif', 'image/webp'],
+    localPatterns: [
+      {
+        pathname: '/**',
+      },
+    ],
     // リモート画像のドメインを許可
     remotePatterns: [
       // Instagram

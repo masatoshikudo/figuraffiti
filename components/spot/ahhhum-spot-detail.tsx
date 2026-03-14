@@ -4,25 +4,29 @@ import Link from "next/link"
 import type { Spot } from "@/types/spot"
 import { Button } from "@/components/ui/button"
 import { formatLastSeen } from "@/lib/spot/last-seen-utils"
-import { QrCode, Sparkles, X } from "lucide-react"
+import { Compass, QrCode, Sparkles, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface AhhHumSpotDetailProps {
   spot: Spot
+  onStartExploration: () => void
   onRecordDiscovery: () => void
   onClose: () => void
   isAuthenticated: boolean
+  isStartingExploration?: boolean
 }
 
 /**
  * AhhHum Phase1: サークル詳細オーバーレイ
- * #N, 文脈, Last Seen, [NFC/QRで発見を記録する] CTA
+ * #N, 文脈, Last Seen, [NFCで発見を記録する] CTA
  */
 export function AhhHumSpotDetail({
   spot,
+  onStartExploration,
   onRecordDiscovery,
   onClose,
   isAuthenticated,
+  isStartingExploration = false,
 }: AhhHumSpotDetailProps) {
   const locationLabel = [spot.prefecture, spot.spotName].filter(Boolean).join(" / ") || "Unknown"
   const contextLabel = spot.context || ""
@@ -72,13 +76,32 @@ export function AhhHumSpotDetail({
           </Button>
         ) : null}
 
+        <div className="space-y-2">
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={onStartExploration}
+            disabled={isStartingExploration}
+          >
+            <Compass className="h-4 w-4 mr-2" />
+            {isStartingExploration
+              ? "探索開始中..."
+              : isAuthenticated
+                ? "このスポットを探す"
+                : "ログインして探す"}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            探索宣言は30分で自動終了し、発見成功時にも終了します。
+          </p>
+        </div>
+
         <Button
           className="w-full"
           onClick={onRecordDiscovery}
         >
           <QrCode className="h-4 w-4 mr-2" />
           {isAuthenticated
-            ? "NFC/QRで発見を記録する"
+            ? "NFCで発見を記録する"
             : "ログインして発見を記録"}
         </Button>
       </div>
