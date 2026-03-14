@@ -50,7 +50,16 @@ ON CONFLICT (user_id) DO NOTHING;
 
 ---
 
-## 4. 起動
+## 4. 限定公開での確認
+
+- `/private-access` が管理者向けの入口です
+- 未ログイン時はログインまたはアカウント作成ができます
+- `admin_users` に登録済みの `user_id` のみサイト全体へアクセスできます
+- ログイン済みでも未登録アカウントは、その場で `user_id` と登録 SQL を確認できます
+
+---
+
+## 5. 起動
 
 ```bash
 npm install
@@ -61,7 +70,7 @@ http://localhost:3000 でアクセス。
 
 ---
 
-## 5. Edge Functions（メール通知・オプション）
+## 6. Edge Functions（メール通知・オプション）
 
 管理者・投稿者へのメール通知が必要な場合：
 
