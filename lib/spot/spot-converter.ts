@@ -28,6 +28,9 @@ export function dbToSpot(dbSpot: DbSpot): Spot {
     approvedBy: dbSpot.approved_by || undefined,
     approvedAt: dbSpot.approved_at || undefined,
     rejectionReason: dbSpot.rejection_reason || undefined,
+    expiresAt: dbSpot.expires_at ?? undefined,
+    archivedAt: dbSpot.archived_at ?? undefined,
+    archiveReason: dbSpot.archive_reason ?? undefined,
     lastSeen: dbSpot.last_seen ?? undefined,
     spotNumber: dbSpot.spot_number ?? undefined,
     visibleAfter: dbSpot.visible_after ?? undefined,
@@ -55,6 +58,9 @@ export function spotToDb(spot: Partial<Spot>) {
     ...(spot.approvedBy && { approved_by: spot.approvedBy }),
     ...(spot.approvedAt && { approved_at: spot.approvedAt }),
     ...(spot.rejectionReason && { rejection_reason: spot.rejectionReason }),
+    ...(spot.expiresAt !== undefined && { expires_at: spot.expiresAt }),
+    ...(spot.archivedAt !== undefined && { archived_at: spot.archivedAt }),
+    ...(spot.archiveReason !== undefined && { archive_reason: spot.archiveReason }),
   }
 
   // Phase1: cover_url は media[0].url から設定

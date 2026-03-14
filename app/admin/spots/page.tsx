@@ -7,7 +7,7 @@ export default function AdminSpotsPage() {
   return (
     <AdminShell
       title="Admin / Spots"
-      description="スポットの承認待ち確認と公開可否の判断を行います。"
+      description="スポット作成、公開待ち確認、履歴入り状況の確認を行います。"
     >
       <AdminSpotsPanel />
     </AdminShell>

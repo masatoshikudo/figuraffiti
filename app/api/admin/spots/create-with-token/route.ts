@@ -94,6 +94,8 @@ export async function POST(request: NextRequest) {
       AHHHUM_CONFIG.CIRCLE_RADIUS_M
     )
     const visibleAfter = new Date()
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + AHHHUM_CONFIG.SPOT_EXPIRATION_DAYS)
 
     if (process.env.NODE_ENV !== "development") {
       visibleAfter.setHours(
@@ -115,11 +117,12 @@ export async function POST(request: NextRequest) {
         status: SPOT_STATUS.APPROVED,
         spot_number: spotNumber,
         visible_after: visibleAfter.toISOString(),
+        expires_at: expiresAt.toISOString(),
         submitted_by: user.id,
         approved_by: user.id,
         approved_at: new Date().toISOString(),
       })
-      .select("id, spot_name, spot_number, display_lat, display_lng, visible_after")
+      .select("id, spot_name, spot_number, display_lat, display_lng, visible_after, expires_at")
       .single()
 
     if (insertSpotError || !insertedSpot) {
@@ -160,6 +163,7 @@ export async function POST(request: NextRequest) {
       displayLat: insertedSpot.display_lat,
       displayLng: insertedSpot.display_lng,
       visibleAfter: insertedSpot.visible_after,
+      expiresAt: insertedSpot.expires_at,
       token,
       nfcUrl,
     })

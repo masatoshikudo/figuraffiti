@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS spots (
   approved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   approved_at TIMESTAMP WITH TIME ZONE,
   rejection_reason TEXT,
+  expires_at TIMESTAMP WITH TIME ZONE,
+  archived_at TIMESTAMP WITH TIME ZONE,
+  archive_reason TEXT,
   cover_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -31,11 +34,17 @@ CREATE TABLE IF NOT EXISTS spots (
 ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lat DOUBLE PRECISION;
 ALTER TABLE spots ADD COLUMN IF NOT EXISTS display_lng DOUBLE PRECISION;
 ALTER TABLE spots ADD COLUMN IF NOT EXISTS visible_after TIMESTAMP WITH TIME ZONE;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS archive_reason TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_spots_lat_lng ON spots(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_spots_status ON spots(status);
 CREATE INDEX IF NOT EXISTS idx_spots_last_seen ON spots(last_seen);
 CREATE INDEX IF NOT EXISTS idx_spots_spot_number ON spots(spot_number);
+CREATE INDEX IF NOT EXISTS idx_spots_visible_after ON spots(visible_after);
+CREATE INDEX IF NOT EXISTS idx_spots_expires_at ON spots(expires_at);
+CREATE INDEX IF NOT EXISTS idx_spots_archived_at ON spots(archived_at);
 
 -- spot_number 採番（既存データ用）
 DO $$
@@ -261,7 +270,6 @@ SET search_path = public
 AS $$
 DECLARE
   v_user_id UUID := auth.uid();
-  v_has_recent_log BOOLEAN;
 BEGIN
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'AUTH_REQUIRED';
@@ -272,22 +280,10 @@ BEGIN
     FROM spots
     WHERE id = p_spot_id
       AND status = 'approved'
+      AND archived_at IS NULL
+      AND (expires_at IS NULL OR expires_at > NOW())
   ) THEN
     RAISE EXCEPTION 'SPOT_NOT_FOUND';
-  END IF;
-
-  SELECT EXISTS (
-    SELECT 1
-    FROM discovery_logs
-    WHERE spot_id = p_spot_id
-      AND user_id = v_user_id
-      AND discovered_at >= NOW() - INTERVAL '5 minutes'
-  )
-  INTO v_has_recent_log;
-
-  IF v_has_recent_log THEN
-    RETURN QUERY SELECT TRUE, TRUE, '発見を記録しました';
-    RETURN;
   END IF;
 
   INSERT INTO discovery_logs (spot_id, user_id)
@@ -299,7 +295,10 @@ BEGIN
     AND ended_at IS NULL;
 
   UPDATE spots
-  SET last_seen = NOW()
+  SET
+    last_seen = NOW(),
+    archived_at = NOW(),
+    archive_reason = 'discovered'
   WHERE id = p_spot_id;
 
   RETURN QUERY SELECT TRUE, FALSE, '発見を記録しました';

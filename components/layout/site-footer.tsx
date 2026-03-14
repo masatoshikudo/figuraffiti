@@ -31,7 +31,7 @@ export function SiteFooter() {
             <p className={combineTokens("mb-8 max-w-md leading-7 text-muted-foreground")}>
               マップでスポットの手がかりを確認し、現地で AhhHum を見つけたら発見を記録できます。
               <br />
-              QR コードの読み取り、または対応端末での NFC タッチに対応しています。
+              対応端末で AhhHum の NFC タグにタッチして、発見を記録できます。
             </p>
             <div className={combineTokens("flex flex-wrap", getSpacingClasses({ gap: "02" }))}>
               <Button className="rounded-full px-6 font-bold" asChild>
@@ -55,7 +55,7 @@ export function SiteFooter() {
             <ul className={combineTokens("space-y-3", getTypography({ size: "sm" }))}>
               <li>
                 <Link href="/education" className="text-muted-foreground transition-colors hover:text-brand">
-                  遊び方を見る
+                  参加方法を見る
                 </Link>
               </li>
               <li>
@@ -70,7 +70,7 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link href="/about" className="text-muted-foreground transition-colors hover:text-brand">
-                  世界観
+                  運営者の考え
                 </Link>
               </li>
               <li>
@@ -95,7 +95,7 @@ export function SiteFooter() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="mt-0.5 h-4 w-4 text-brand" />
                   <p className={combineTokens(getTypography({ size: "sm" }), "leading-6 text-muted-foreground")}>
-                    公共の場所を歩いて探し、現地で見つけたときだけ QR / NFC で発見を記録する体験です。私有地への立ち入りや危険行為、捏造された記録は行わないでください。
+                    公共の場所を歩いて探し、現地で見つけたときだけ NFC で発見を記録する体験です。私有地への立ち入りや危険行為、捏造された記録は行わないでください。
                   </p>
                 </div>
               </div>
@@ -112,7 +112,7 @@ export function SiteFooter() {
                 </li>
                 <li>
                   <Link href="/guidelines" className="text-muted-foreground transition-colors hover:text-brand">
-                    安全に楽しむためのガイド
+                  安全のルール
                   </Link>
                 </li>
               </ul>

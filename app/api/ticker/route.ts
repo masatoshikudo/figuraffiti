@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/supabase-server"
 import type { TickerItem } from "@/types/spot"
 import { ERROR_MESSAGES } from "@/lib/constants"
+import { isSpotPubliclyVisible } from "@/lib/spot/spot-lifecycle"
 
 const PREFECTURE_ENGLISH_LABELS: Record<string, string> = {
   北海道: "HOKKAIDO",
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
         .limit(limit),
       supabase
         .from("spots")
-        .select("id, prefecture, approved_at, visible_after, created_at")
+        .select("id, prefecture, approved_at, visible_after, created_at, archived_at, expires_at")
         .eq("status", "approved")
         .order("approved_at", { ascending: false, nullsFirst: false })
         .limit(limit),
@@ -165,7 +166,17 @@ export async function GET(request: NextRequest) {
     const spotReleaseItems: TickerItem[] = (spots || [])
       .map((spot) => {
         const releaseAt = getSpotReleaseAt(spot)
-        if (!releaseAt || new Date(releaseAt).getTime() > now) {
+        if (
+          !releaseAt ||
+          !isSpotPubliclyVisible(
+            {
+              visibleAfter: spot.visible_after ?? null,
+              archivedAt: spot.archived_at ?? null,
+              expiresAt: spot.expires_at ?? null,
+            },
+            new Date(now)
+          )
+        ) {
           return null
         }
 

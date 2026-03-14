@@ -22,6 +22,9 @@ export interface Spot {
   approvedBy?: string // UUID（承認者）
   approvedAt?: string // 承認日時
   rejectionReason?: string // 却下理由
+  expiresAt?: string | null
+  archivedAt?: string | null
+  archiveReason?: string | null
   // AhhHum Phase1
   lastSeen?: string | null // 最終発見日時（鮮度表示用）
   spotNumber?: number | null // #N の N（ティッカー表示用）

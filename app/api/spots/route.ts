@@ -6,6 +6,7 @@ import { parseApiError, logApiError } from "@/lib/api/api-utils"
 import { SPOT_MERGE_CONFIG, SPOT_STATUS, ERROR_MESSAGES } from "@/lib/constants"
 import { calculateDistance } from "@/lib/spot/spot-utils"
 import { isTrustedUser } from "@/lib/api/admin-utils"
+import { isSpotPubliclyVisible } from "@/lib/spot/spot-lifecycle"
 
 /**
  * 認証チェック: ユーザーがログインしているか確認
@@ -134,7 +135,10 @@ export async function GET(request: NextRequest) {
       })) || [],
     })
 
-    const spotsWithMedia = (spots || []).map((spot) => dbToSpot(spot))
+    const now = new Date()
+    const spotsWithMedia = (spots || [])
+      .map((spot) => dbToSpot(spot))
+      .filter((spot) => isSpotPubliclyVisible(spot, now))
 
     console.log("[GET /api/spots] Returning spots with media:", {
       count: spotsWithMedia.length,

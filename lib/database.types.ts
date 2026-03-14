@@ -109,6 +109,9 @@ export interface Database {
           approved_by: string | null
           approved_at: string | null
           rejection_reason: string | null
+          expires_at: string | null
+          archived_at: string | null
+          archive_reason: string | null
           last_seen: string | null
           spot_number: number | null
           visible_after: string | null
@@ -130,6 +133,9 @@ export interface Database {
           approved_by?: string | null
           approved_at?: string | null
           rejection_reason?: string | null
+          expires_at?: string | null
+          archived_at?: string | null
+          archive_reason?: string | null
           last_seen?: string | null
           spot_number?: number | null
           visible_after?: string | null
@@ -151,6 +157,9 @@ export interface Database {
           approved_by?: string | null
           approved_at?: string | null
           rejection_reason?: string | null
+          expires_at?: string | null
+          archived_at?: string | null
+          archive_reason?: string | null
           last_seen?: string | null
           spot_number?: number | null
           visible_after?: string | null

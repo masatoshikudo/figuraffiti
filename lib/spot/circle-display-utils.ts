@@ -1,4 +1,5 @@
 import type { Spot } from "@/types/spot"
+import { isSpotPubliclyVisible } from "@/lib/spot/spot-lifecycle"
 
 const EARTH_RADIUS_METERS = 6371000
 
@@ -34,10 +35,5 @@ export function getSpotCircleCenter(spot: Spot) {
 }
 
 export function isSpotVisible(spot: Spot, now: Date = new Date()) {
-  if (!spot.visibleAfter) return true
-
-  const visibleAt = new Date(spot.visibleAfter)
-  if (Number.isNaN(visibleAt.getTime())) return true
-
-  return visibleAt.getTime() <= now.getTime()
+  return isSpotPubliclyVisible(spot, now)
 }

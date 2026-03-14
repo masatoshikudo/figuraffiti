@@ -7,6 +7,8 @@ import { HomeDiscoveryTickerSection } from "@/components/discovery/home-discover
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Map } from "lucide-react"
 import { createClient } from "@/lib/supabase/supabase-server"
+import { isSpotPubliclyVisible } from "@/lib/spot/spot-lifecycle"
+import { dbToSpot } from "@/lib/spot/spot-converter"
 
 const DEFAULT_PREFECTURE = "東京都"
 
@@ -117,7 +119,7 @@ const ahhHumPillars = [
   },
   {
     title: "見つけたら「タッチ」できる",
-    body: "Ahh と Hum には NFC タグと QR コードがついている。「タッチ」して、記録できる。",
+    body: "Ahh と Hum には NFC タグがついている。「タッチ」して、記録できる。",
   },
   {
     title: "いつまでそこにいるかわからない",
@@ -198,13 +200,15 @@ async function getHomeStats(prefecture: string) {
     const supabase = await createClient()
 
     const countSpotsInPrefecture = async (targetPrefecture: string) => {
-      const { count } = await supabase
+      const { data } = await supabase
         .from("spots")
-        .select("id", { count: "exact", head: true })
+        .select("*")
         .eq("prefecture", targetPrefecture)
         .or("status.eq.approved,status.is.null")
 
-      return count ?? 0
+      return (data || [])
+        .map((spot) => dbToSpot(spot))
+        .filter((spot) => isSpotPubliclyVisible(spot)).length
     }
 
     const [initialSpotCount, { count: discoveryCount }] = await Promise.all([
@@ -452,7 +456,7 @@ export default async function Home() {
               <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Touch AhhHum</p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">見つけたら「タッチ」しよう</h2>
               <p className="text-base leading-7 text-muted-foreground sm:text-lg">
-                AhhHum を見つけたら、その場で発見を記録できます。フィギュアの QR コードを読み取るか、対応端末で NFC にタッチすると、現地で見つけた記録が履歴に保存されます。
+                AhhHum を見つけたら、その場で発見を記録できます。フィギュアの NFC タグにタッチすると、現地で見つけた記録が履歴に保存されます。
               </p>
               <div>
                 <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>

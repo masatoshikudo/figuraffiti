@@ -48,14 +48,14 @@ export async function POST(request: NextRequest) {
 
       if (rpcError.message.includes("NFC_TAG_NOT_FOUND")) {
         return NextResponse.json(
-          { error: "無効なNFCタグです" },
+          { error: "こんなタグ知らない" },
           { status: 404 }
         )
       }
 
       if (rpcError.message.includes("NFC_TAG_ALREADY_USED")) {
         return NextResponse.json(
-          { error: "このNFCタグはすでに使用済みです" },
+          { error: "すでに誰かに発見されています" },
           { status: 409 }
         )
       }

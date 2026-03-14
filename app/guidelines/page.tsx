@@ -1,191 +1,148 @@
+import Link from "next/link"
+import { Compass, LifeBuoy, ShieldAlert } from "lucide-react"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSpacingClasses, getTypography, combineTokens } from "@/lib/design/design-tokens"
-import Link from "next/link"
-import { Compass, LifeBuoy, Map, ShieldAlert } from "lucide-react"
+import { EXTERNAL_URLS } from "@/lib/constants"
+
+const principles = [
+  {
+    title: "公共の場所だけで探す",
+    body: "歩いて探すのは、立ち入りが許されている公共の場所だけです。私有地や管理区域には入らないでください。",
+    icon: Compass,
+  },
+  {
+    title: "実際に見つけたことだけを残す",
+    body: "発見記録は、現地で本当に見つけた内容だけを扱います。推測や代理記録、捏造はしないでください。",
+    icon: ShieldAlert,
+  },
+  {
+    title: "迷ったらやらない",
+    body: "危ないかもしれない、迷惑かもしれない、と感じた時点で中止するのが AhhHum の前提です。",
+    icon: LifeBuoy,
+  },
+] as const
+
+const dos = [
+  "周囲に配慮しながら、歩いて探す",
+  "実際に見つけた AhhHum だけを記録する",
+  "人通りや交通の妨げにならない場所で行動する",
+  "迷ったら中止し、必要なら運営へ相談する",
+] as const
+
+const donts = [
+  "私有地や立入禁止エリアへ無断で入ること",
+  "危険行為、迷惑行為、法令違反につながる行為",
+  "自分で見つけていない発見を記録すること",
+  "NFCタグや設置物を壊したり持ち去ったりすること",
+] as const
+
+const decisionRules = [
+  "その場所に入ってよいと即答できないなら、入らない。",
+  "周囲の人から見て不審に映る行為になりそうなら、やらない。",
+  "安全より発見を優先しそうになったら、その時点でやめる。",
+] as const
 
 export default function GuidelinesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader variant="overlay" />
-      <main className="container mx-auto flex-1 max-w-4xl px-4 pb-16 pt-24">
-        <div className="space-y-8 sm:space-y-10">
-          <div className="space-y-4 text-center">
+      <main className="flex-1 pt-24">
+        <section className="border-b border-border/70 bg-card/35">
+          <div className="container mx-auto max-w-4xl px-4 py-16 text-center sm:py-20">
             <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">Guidelines</p>
-            <h1 className={combineTokens("tracking-tight", getTypography({ size: "4xl", weight: "bold" }))}>
-              探索・発見記録ガイドライン
-            </h1>
-            <p className={combineTokens("mx-auto max-w-2xl leading-8", getTypography({ size: "lg" }), "text-muted-foreground")}>
-              AhhHum は、街で痕跡を探し、現地で見つけたことを記録するサービスです。
-              はじめる前に、守るべきポイントだけ先に確認できます。
+            <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">安全に楽しむための境界線</h1>
+            <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
+              このページは、AhhHum を安全に、そして長く続けられる遊びにするための最低限のルールをまとめたものです。
             </p>
-            <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <Link href="/discover/mapping" className="rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-card">
-                マップを見る
-              </Link>
-              <Link href="/how-it-works" className="rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-                発見記録の流れ
-              </Link>
+          </div>
+        </section>
+
+        <section className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
+          <div className="grid gap-4 md:grid-cols-3">
+            {principles.map((item) => {
+              const Icon = item.icon
+
+              return (
+                <article key={item.title} className="rounded-[2rem] border border-border/70 bg-card/60 p-6">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-brand/25 bg-brand/10 text-brand">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-lg font-semibold tracking-tight">{item.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.body}</p>
+                </article>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="border-y border-border/70 bg-card/35">
+          <div className="container mx-auto max-w-5xl px-4 py-14 sm:py-16">
+            <div className="grid gap-6 md:grid-cols-2">
+              <article className="rounded-[2rem] border border-primary/15 bg-background/60 p-6">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">してよいこと</h2>
+                <ul className="mt-5 space-y-3 text-sm leading-7 text-muted-foreground">
+                  {dos.map((item) => (
+                    <li key={item} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className="rounded-[2rem] border border-destructive/15 bg-background/60 p-6">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">してはいけないこと</h2>
+                <ul className="mt-5 space-y-3 text-sm leading-7 text-muted-foreground">
+                  {donts.map((item) => (
+                    <li key={item} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </article>
             </div>
           </div>
+        </section>
 
-          <section className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-[2rem] border border-border/70 bg-card/65 p-5">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-brand/25 bg-brand/10 text-brand">
-                <Compass className="h-5 w-5" />
-              </div>
-              <h2 className="text-lg font-semibold tracking-tight">やってよいこと</h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                公共の場所で、周囲に配慮しながら歩いて探し、実際に見つけた内容だけを記録すること。
+        <section className="container mx-auto max-w-4xl px-4 py-14 sm:py-16">
+          <div className="rounded-[2rem] border border-border/70 bg-card/60 p-7">
+            <p className="text-sm font-medium uppercase tracking-[0.24em] text-brand-strong">When You Are Unsure</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">迷ったときの判断基準</h2>
+            <ul className="mt-6 space-y-3 text-sm leading-7 text-muted-foreground sm:text-base">
+              {decisionRules.map((rule) => (
+                <li key={rule} className="rounded-2xl border border-border/70 bg-background/55 px-4 py-3">
+                  {rule}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="container mx-auto max-w-4xl px-4 py-14 sm:py-16">
+          <div className="flex flex-col gap-4 rounded-[2rem] border border-border/70 bg-card/60 p-7 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-lg font-medium">細かい条件が必要な場合は、規約と問い合わせ先を確認してください。</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                このページは原則だけに絞っています。個別判断が必要なケースは運営へ相談できます。
               </p>
             </div>
-            <div className="rounded-[2rem] border border-border/70 bg-card/65 p-5">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-brand/25 bg-brand/10 text-brand">
-                <ShieldAlert className="h-5 w-5" />
-              </div>
-              <h2 className="text-lg font-semibold tracking-tight">避けること</h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                私有地への立ち入り、危険行為、迷惑行為、捏造された記録やなりすましは行わないでください。
-              </p>
-            </div>
-            <div className="rounded-[2rem] border border-border/70 bg-card/65 p-5">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-brand/25 bg-brand/10 text-brand">
-                <LifeBuoy className="h-5 w-5" />
-              </div>
-              <h2 className="text-lg font-semibold tracking-tight">迷ったとき</h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                判断に迷う場所では無理をせず中止し、必要なら運営へお問い合わせください。
-              </p>
-            </div>
-          </section>
-
-          {/* 発見記録の目的 */}
-          <Card className="rounded-[2rem] border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>発見記録の目的</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="leading-7 text-muted-foreground">
-                AhhHum は、都市の余白に潜む痕跡を探し、現地で発見した事実を記録するためのサービスです。
-              </p>
-              <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
-                <li>「ここで見つけた」という発見の証跡を残す</li>
-                <li>Last Seen やティッカーに世界の動きを反映する</li>
-                <li>NFCタグを通じて発見とデジタル体験を接続する</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* 記録の方法 */}
-          <Card className="rounded-[2rem] border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>記録の方法</CardTitle>
-              <CardDescription>マップで探し、現地で NFC を使って記録します</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="leading-7 text-muted-foreground">
-                詳しくは<Link href="/how-it-works" className="text-primary hover:underline">探し方</Link>ページをご覧ください。
-              </p>
-              <p className="text-sm leading-7 text-muted-foreground">
-                曖昧なサークルを手がかりに現地まで行き、見つけた AhhHum の NFCタグを読み取って発見を記録します。
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* 報告のルール */}
-          <Card className="rounded-[2rem] border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>報告のルール</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-3xl border border-primary/15 bg-primary/6 p-5">
-                  <h3 className="mb-3 font-semibold text-primary">守るべきこと</h3>
-                  <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground">
-                    <li>実際にその場所で見つけた痕跡だけを記録すること</li>
-                    <li>私有地・危険な場所・法令違反となる行為を避けること</li>
-                    <li>NFCタグの記録結果や発見内容を正確に扱うこと</li>
-                  </ul>
-                </div>
-                <div className="rounded-3xl border border-destructive/15 bg-destructive/5 p-5">
-                  <h3 className="mb-3 font-semibold text-destructive">してはいけないこと</h3>
-                  <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground">
-                    <li>捏造された記録や別場所でのなりすまし</li>
-                    <li>危険行為、迷惑行為、私有地への無断立ち入り</li>
-                    <li>スパム的な連続記録や不正な重複送信</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 運用方針 */}
-          <Card className="rounded-[2rem] border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>運用方針</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="leading-7 text-muted-foreground">
-                Phase1 の中心は「探索」と「発見記録」です。共創申請や高度な投稿機能は、後続フェーズで段階的に追加されます。
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold">探索:</span>
-                  <span className="text-sm text-muted-foreground">
-                    曖昧なサークル、Last Seen、ティッカーを使って都市の中を探します。
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold">記録:</span>
-                  <span className="text-sm text-muted-foreground">
-                    現地で見つけた AhhHum の NFCタグを読み取って発見を記録します。
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* よくある質問 */}
-          <Card className="rounded-[2rem] border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>よくある質問</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Q. ログインは必要ですか？</h3>
-                <p className="text-sm text-muted-foreground">
-                  A. マップ閲覧は未ログインでも可能ですが、発見を記録するにはログインが必要です。
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Q. 動画や写真を直接アップできますか？</h3>
-                <p className="text-sm text-muted-foreground">
-                  A. Phase1 では発見記録が中心で、メディア投稿は最小構成です。将来フェーズで強化予定です。
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Q. 記録した内容を編集・削除できますか？</h3>
-                <p className="text-sm text-muted-foreground">
-                  A. 現時点ではアプリからの編集・削除には対応していません。必要な場合は運営に連絡してください。
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <section className="rounded-[2rem] border border-border/70 bg-card/60 p-6 text-center sm:p-8">
-            <p className="text-lg font-medium">準備ができたら、まずはマップを開いて近くの気配から探してみてください。</p>
-            <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/discover/mapping" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-                <Map className="h-4 w-4" />
-                マップで手がかりを見る
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/terms"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-border/80 bg-background/50 px-6 text-sm font-semibold text-foreground transition-colors hover:bg-card"
+              >
+                利用規約を見る
               </Link>
-              <Link href="/how-it-works" className="rounded-full border border-border/80 bg-background/50 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card">
-                発見記録の流れを見る
-              </Link>
+              <a
+                href={EXTERNAL_URLS.CONTACT_FORM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                お問い合わせ
+              </a>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
       <SiteFooter />
     </div>

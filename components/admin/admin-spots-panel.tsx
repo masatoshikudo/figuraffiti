@@ -20,19 +20,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
+import { getSpotLifecycleState } from "@/lib/spot/spot-lifecycle"
 
 interface CreatedSpotResult {
   spotId: string
   spotName: string
   spotNumber: number | null
   address?: string | null
+  visibleAfter?: string | null
+  expiresAt?: string | null
   token: string
   nfcUrl: string
 }
 
 export function AdminSpotsPanel() {
   const [pendingSpots, setPendingSpots] = useState<Spot[]>([])
+  const [managedSpots, setManagedSpots] = useState<Spot[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingManaged, setLoadingManaged] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCreatingSpot, setIsCreatingSpot] = useState(false)
   const [rejectSpotId, setRejectSpotId] = useState<string | null>(null)
@@ -71,8 +76,35 @@ export function AdminSpotsPanel() {
       })
   }
 
+  const fetchManagedSpots = () => {
+    setLoadingManaged(true)
+    fetch("/api/admin/spots")
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data.error || "管理用スポット一覧の取得に失敗しました")
+        }
+        return res.json()
+      })
+      .then((data) => {
+        setManagedSpots(Array.isArray(data) ? data : [])
+      })
+      .catch((error) => {
+        toast({
+          title: "取得に失敗しました",
+          description: error instanceof Error ? error.message : "管理用スポット一覧の取得に失敗しました",
+          variant: "destructive",
+        })
+        setManagedSpots([])
+      })
+      .finally(() => {
+        setLoadingManaged(false)
+      })
+  }
+
   useEffect(() => {
     fetchPendingSpots()
+    fetchManagedSpots()
   }, [])
 
   const handleLocationChange = (lat: number, lng: number, address?: string) => {
@@ -115,6 +147,8 @@ export function AdminSpotsPanel() {
         spotName: data.spotName,
         spotNumber: data.spotNumber ?? null,
         address: data.address ?? selectedAddress,
+        visibleAfter: data.visibleAfter ?? null,
+        expiresAt: data.expiresAt ?? null,
         token: data.token,
         nfcUrl: data.nfcUrl,
       }
@@ -128,6 +162,7 @@ export function AdminSpotsPanel() {
         description: "外部のNFC書き込みアプリへURLを貼り付けてください。",
       })
       fetchPendingSpots()
+      fetchManagedSpots()
     } catch (error) {
       toast({
         title: "作成に失敗しました",
@@ -196,6 +231,7 @@ export function AdminSpotsPanel() {
         description: "スポットを公開状態にしました。",
       })
       fetchPendingSpots()
+      fetchManagedSpots()
     } catch (error) {
       toast({
         title: "承認に失敗しました",
@@ -233,6 +269,7 @@ export function AdminSpotsPanel() {
       setRejectSpotId(null)
       setRejectionReason("")
       fetchPendingSpots()
+      fetchManagedSpots()
     } catch (error) {
       toast({
         title: "却下に失敗しました",
@@ -313,6 +350,18 @@ export function AdminSpotsPanel() {
                 <h3 className="font-semibold">
                   #{createdSpot.spotNumber ?? "?"} {createdSpot.spotName}
                 </h3>
+                <div className="flex flex-wrap gap-2">
+                  {createdSpot.visibleAfter && new Date(createdSpot.visibleAfter).getTime() > Date.now() ? (
+                    <Badge variant="secondary">#公開待ち</Badge>
+                  ) : (
+                    <Badge>#公開中</Badge>
+                  )}
+                  {createdSpot.expiresAt ? (
+                    <Badge variant="outline">
+                      期限: {new Date(createdSpot.expiresAt).toLocaleDateString("ja-JP")}
+                    </Badge>
+                  ) : null}
+                </div>
                 <p className="text-sm text-muted-foreground break-all">
                   Spot ID: {createdSpot.spotId}
                 </p>
@@ -361,6 +410,74 @@ export function AdminSpotsPanel() {
               </div>
             </div>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Managed Spots</CardTitle>
+          <Button variant="outline" size="sm" onClick={fetchManagedSpots} disabled={loadingManaged}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loadingManaged ? "animate-spin" : ""}`} />
+            更新
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {loadingManaged ? (
+            <div className="flex items-center justify-center py-8 text-muted-foreground">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              読み込み中...
+            </div>
+          ) : managedSpots.length === 0 ? (
+            <p className="py-8 text-center text-muted-foreground">管理中のスポットはまだありません。</p>
+          ) : (
+            <div className="space-y-4">
+              {managedSpots.map((spot) => {
+                const lifecycle = getSpotLifecycleState(spot)
+                const lifecycleLabel =
+                  lifecycle === "pending_release"
+                    ? "#公開待ち"
+                    : lifecycle === "live"
+                      ? "#公開中"
+                      : lifecycle === "archived"
+                        ? "#履歴入り"
+                        : "#期限切れ"
+
+                return (
+                  <div key={spot.id} className="rounded-xl border p-4 space-y-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <h3 className="font-semibold text-lg">
+                          #{spot.spotNumber ?? "?"} {spot.spotName || "スポット名なし"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {[spot.prefecture, spot.address].filter(Boolean).join(" / ") || "住所未設定"}
+                        </p>
+                        {spot.context ? (
+                          <p className="text-sm text-muted-foreground">{spot.context}</p>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant={lifecycle === "live" ? "default" : "secondary"}>
+                          {lifecycleLabel}
+                        </Badge>
+                        {spot.visibleAfter ? (
+                          <Badge variant="outline">
+                            公開: {new Date(spot.visibleAfter).toLocaleString("ja-JP")}
+                          </Badge>
+                        ) : null}
+                        {spot.expiresAt ? (
+                          <Badge variant="outline">
+                            期限: {new Date(spot.expiresAt).toLocaleDateString("ja-JP")}
+                          </Badge>
+                        ) : null}
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground break-all">Spot ID: {spot.id}</p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 

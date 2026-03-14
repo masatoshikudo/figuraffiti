@@ -31,9 +31,9 @@ export function SiteHeader({ variant = "page" }: { variant?: SiteHeaderVariant }
     ? "rounded-full border border-border/90 bg-background/92 px-3 py-1.5 text-foreground backdrop-blur-xl"
     : ""
   const navLinks = [
-    { href: "/about", label: "世界観" },
-    { href: "/education", label: "遊び方" },
-    { href: "/guidelines", label: "ガイド" },
+    { href: "/about", label: "考え方" },
+    { href: "/education", label: "参加方法" },
+    { href: "/guidelines", label: "ルール" },
   ]
 
   return (
