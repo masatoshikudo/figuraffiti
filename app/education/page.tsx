@@ -1,11 +1,24 @@
 import Link from "next/link"
-import { ArrowRight, Map, Sparkles, Trophy } from "lucide-react"
+import { ArrowRight, Map, Sparkles, Trophy, type LucideIcon } from "lucide-react"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { Button } from "@/components/ui/button"
 import { EXTERNAL_URLS } from "@/lib/constants"
 
-const participationPaths = [
+type ParticipationPath = {
+  title: string
+  catchcopy: string
+  members: string
+  body: string
+  firstStep: string
+  nextStep: string
+  ctaLabel: string
+  href: string
+  icon: LucideIcon
+  external?: boolean
+}
+
+const participationPaths: readonly ParticipationPath[] = [
   {
     title: "探す人",
     catchcopy: "まずは、街の気配を追いかけよう。",
@@ -43,7 +56,7 @@ const participationPaths = [
     icon: Sparkles,
     external: true,
   },
-] as const
+]
 
 export default function EducationPage() {
   return (
